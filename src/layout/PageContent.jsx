@@ -12,6 +12,7 @@ import MyCollectionsPage from "../pages/MyCollectionsPage";
 import VenuesPage from "../pages/VenuesPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
 import VenueDetailPage from "../pages/VenueDetailPage";
+import ProfilePage from "../pages/ProfilePage";
 
 const PageContent = () => {
   return (
@@ -35,6 +36,7 @@ const PageContent = () => {
       <Route path="/create-homebrew" element={<CreateHomebrewPage />} />
       <Route path="/collections/me" element={<MyCollectionsPage />} />
       <Route path="/venues" element={<VenuesPage />} />
+      <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/venues/new" element={<CreateVenuePage />} />
       <Route path="/venues/:id" element={<VenueDetailPage />} />
 
