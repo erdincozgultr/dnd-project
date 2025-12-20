@@ -235,7 +235,7 @@ const Header = () => {
                         <ScrollText size={16} /> Koleksiyonlarım
                       </Link>
                       <Link 
-                        to="/settings"
+                        to="/ayarlar"
                         onClick={() => setIsUserMenuOpen(false)}
                         className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sti hover:bg-cbg/50 hover:text-mtf rounded-lg transition-colors"
                       >

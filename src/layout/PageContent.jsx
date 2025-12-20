@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import SettingsPage from "../pages/SettingsPage";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -39,6 +39,8 @@ const PageContent = () => {
       <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/venues/new" element={<CreateVenuePage />} />
       <Route path="/venues/:id" element={<VenueDetailPage />} />
+      <Route path="/ayarlar" element={<SettingsPage />} />
+      <Route path="/settings" element={<Navigate to="/ayarlar" replace />} />
 
       {/* Hatalı Linkler -> Anasayfaya yönlendir */}
       <Route path="*" element={<Navigate to="/" replace />} />
