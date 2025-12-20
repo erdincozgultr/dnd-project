@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* Font Ailesi */
+  --font-display: "Montserrat", sans-serif;
+
+  /* --- RENK PALETİ --- */
+  
+  /* Arkaplan (Main Background - Krem/Kağıt Rengi) */
+  --color-mbg: #FDFBF7; 
+
+  /* Kart/Çizgi (Card Background - Hafif Gri) */
+  --color-cbg: #E7E5E4; 
+
+  /* Vurgu (Call to Action - Kehribar/Turuncu) */
+  --color-cta: #D97706; 
+  --color-cta-hover: #B45309;
+
+  /* İkincil Metin (Secondary Text - Koyu Gri) */
+  --color-sti: #57534E; 
+
+  /* Ana Buton (Primary Button - Çok Koyu Kahve/Siyah) */
+  --color-pb:  #292524; 
+
+  /* Ana Metin (Main Text - Siyahımsı) */
+  --color-mtf: #1C1917; 
+
+  /* Koyu Üzerine Metin (Text on Dark - Açık Krem) */
+  --color-td:  #FEF3C7;
+}
+
+/* Genel Ayarlar */
+body {
+  background-color: var(--color-mbg);
+  color: var(--color-mtf);
+  font-family: var(--font-display);
+  
+  /* DÜZELTME: 'antialiased' yerine gerçek CSS kodlarını yazdık */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar (Temaya Uygun) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--color-mbg);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-cbg);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-cta);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
