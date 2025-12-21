@@ -18,6 +18,9 @@ import LeaderboardPage from "../pages/LeaderboardPage";
 import GuildsPage from "../pages/GuildsPage";
 import GuildDetailPage from "../pages/GuildDetailPage";
 import CreateGuildPage from "../pages/CreateGuildPage";
+import MarketplacePage from "../pages/MarketplacePage";
+import ListingDetailPage from "../pages/ListingDetailPage";
+import CreateListingPage from "../pages/CreateListingPage";
 
 const PageContent = () => {
   return (
@@ -69,6 +72,15 @@ const PageContent = () => {
         path="/taverna/loncalar/:id/duzenle"
         element={<CreateGuildPage />}
       />
+
+      {/* Marketplace / Bit Pazarı */}
+      <Route path="/pazar" element={<MarketplacePage />} />
+      <Route path="/pazar/:id" element={<ListingDetailPage />} />
+      <Route path="/pazar/ilan-olustur" element={<CreateListingPage />} />
+      <Route path="/pazar/duzenle/:id" element={<CreateListingPage />} />
+
+      {/* Redirect */}
+      <Route path="/marketplace" element={<Navigate to="/pazar" replace />} />
 
       {/* Auth */}
       <Route path="/giris" element={<LoginPage />} />
