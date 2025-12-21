@@ -13,22 +13,14 @@ import VenuesPage from "../pages/VenuesPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
 import VenueDetailPage from "../pages/VenueDetailPage";
 import ProfilePage from "../pages/ProfilePage";
+import TavernaPage from "../pages/TavernaPage";
+import LeaderboardPage from "../pages/LeaderboardPage";
 
 const PageContent = () => {
   return (
     <Routes>
       {/* Ana Sayfa */}
       <Route path="/" element={<HomePage />} />
-      {/* Auth İşlemleri */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      // src/layout/PageContent.jsx - Route'ları Türkçeleştir
-      <Route path="/parti-bul" element={<PartyFinderPage />} />
-      <Route
-        path="/party-finder"
-        element={<Navigate to="/parti-bul" replace />}
-      />
-      <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
       <Route
         path="/create-campaign"
         element={<Navigate to="/kampanya-olustur" replace />}
@@ -42,11 +34,36 @@ const PageContent = () => {
       <Route path="/create-homebrew" element={<CreateHomebrewPage />} />
       <Route path="/collections/me" element={<MyCollectionsPage />} />
       <Route path="/venues" element={<VenuesPage />} />
-      <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/venues/new" element={<CreateVenuePage />} />
       <Route path="/venues/:id" element={<VenueDetailPage />} />
+
+      {/* Taverna */}
+      <Route path="/taverna" element={<TavernaPage />} />
+      <Route path="/taverna/siralama" element={<LeaderboardPage />} />
+
+      {/* Profile & Settings */}
+      <Route path="/profil/:username" element={<ProfilePage />} />
+      <Route
+        path="/profile/:username"
+        element={<Navigate to="/profil/:username" replace />}
+      />
       <Route path="/ayarlar" element={<SettingsPage />} />
-      <Route path="/settings" element={<Navigate to="/ayarlar" replace />} />
+
+      {/* Campaign */}
+      <Route path="/parti-bul" element={<PartyFinderPage />} />
+      <Route
+        path="/party-finder"
+        element={<Navigate to="/parti-bul" replace />}
+      />
+      <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
+      <Route path="/kampanya-duzenle/:id" element={<CreateCampaignPage />} />
+
+      {/* Auth */}
+      <Route path="/giris" element={<LoginPage />} />
+      <Route path="/login" element={<Navigate to="/giris" replace />} />
+      <Route path="/kayit" element={<RegisterPage />} />
+      <Route path="/register" element={<Navigate to="/kayit" replace />} />
+
       {/* Hatalı Linkler -> Anasayfaya yönlendir */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

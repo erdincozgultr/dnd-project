@@ -123,7 +123,7 @@ const PartyFinderPage = () => {
       </Helmet>
 
       {/* ==================== HERO SECTION ==================== */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-16 overflow-hidden sm:h-[600px] sm:flex sm:items-center">
         {/* Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center"
