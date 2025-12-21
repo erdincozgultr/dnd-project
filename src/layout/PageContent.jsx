@@ -15,6 +15,9 @@ import VenueDetailPage from "../pages/VenueDetailPage";
 import ProfilePage from "../pages/ProfilePage";
 import TavernaPage from "../pages/TavernaPage";
 import LeaderboardPage from "../pages/LeaderboardPage";
+import GuildsPage from "../pages/GuildsPage";
+import GuildDetailPage from "../pages/GuildDetailPage";
+import CreateGuildPage from "../pages/CreateGuildPage";
 
 const PageContent = () => {
   return (
@@ -57,6 +60,15 @@ const PageContent = () => {
       />
       <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
       <Route path="/kampanya-duzenle/:id" element={<CreateCampaignPage />} />
+
+      {/* Loncalar */}
+      <Route path="/taverna/loncalar" element={<GuildsPage />} />
+      <Route path="/taverna/loncalar/olustur" element={<CreateGuildPage />} />
+      <Route path="/taverna/loncalar/:id" element={<GuildDetailPage />} />
+      <Route
+        path="/taverna/loncalar/:id/duzenle"
+        element={<CreateGuildPage />}
+      />
 
       {/* Auth */}
       <Route path="/giris" element={<LoginPage />} />
