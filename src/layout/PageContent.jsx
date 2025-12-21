@@ -19,14 +19,20 @@ const PageContent = () => {
     <Routes>
       {/* Ana Sayfa */}
       <Route path="/" element={<HomePage />} />
-
       {/* Auth İşlemleri */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-
-      <Route path="/party-finder" element={<PartyFinderPage />} />
-      <Route path="/create-campaign" element={<CreateCampaignPage />} />
-
+      // src/layout/PageContent.jsx - Route'ları Türkçeleştir
+      <Route path="/parti-bul" element={<PartyFinderPage />} />
+      <Route
+        path="/party-finder"
+        element={<Navigate to="/parti-bul" replace />}
+      />
+      <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
+      <Route
+        path="/create-campaign"
+        element={<Navigate to="/kampanya-olustur" replace />}
+      />
       <Route path="/wiki" element={<WikiPage />} />
       <Route path="/wiki/:slug" element={<WikiDetailPage type="official" />} />
       <Route
@@ -41,7 +47,6 @@ const PageContent = () => {
       <Route path="/venues/:id" element={<VenueDetailPage />} />
       <Route path="/ayarlar" element={<SettingsPage />} />
       <Route path="/settings" element={<Navigate to="/ayarlar" replace />} />
-
       {/* Hatalı Linkler -> Anasayfaya yönlendir */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

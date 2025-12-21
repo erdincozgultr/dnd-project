@@ -78,7 +78,7 @@ const Header = () => {
   const navItems = [
     { title: "Nasıl Oynanır", icon: <Compass size={18} />, href: "/how-to-play" },
     { title: "Wiki", icon: <ScrollText size={18} />, href: "/wiki" },
-    { title: "Party Finder", icon: <Swords size={18} />, href: "/party-finder" },
+    { title: "Parti Bul", icon: <Swords size={18} />, href: "/parti-bul" },
     {
       title: "Araçlar",
       icon: <Gavel size={18} />,
