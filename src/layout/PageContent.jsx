@@ -21,6 +21,7 @@ import CreateGuildPage from "../pages/CreateGuildPage";
 import MarketplacePage from "../pages/MarketplacePage";
 import ListingDetailPage from "../pages/ListingDetailPage";
 import CreateListingPage from "../pages/CreateListingPage";
+import BadgesPage from "../pages/BadgesPage";
 
 const PageContent = () => {
   return (
@@ -72,6 +73,8 @@ const PageContent = () => {
         path="/taverna/loncalar/:id/duzenle"
         element={<CreateGuildPage />}
       />
+
+      <Route path="/taverna/rozetler" element={<BadgesPage />} />
 
       {/* Marketplace / Bit Pazarı */}
       <Route path="/pazar" element={<MarketplacePage />} />
