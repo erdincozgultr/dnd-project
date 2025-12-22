@@ -2,58 +2,56 @@ import {
   LOGIN_SUCCESS,
   LOGOUT,
   UPDATE_USER_SUMMARY,
-  SET_USER_DATA,
 } from "../actions/authActions";
-import { STORAGE_KEYS, isTokenValid, getUserFromToken } from '../../api/axiosClient';
 
-// Initial state - sadece token'dan temel bilgiyi al
+const STORAGE_KEYS = { 
+  TOKEN: "zk_auth_token_v1"
+  // USER artık localStorage'da tutulmayacak, sadece Redux'ta olacak
+};
+
 const getInitialState = () => {
   try {
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     
-    if (token && isTokenValid(token)) {
-      // Token'dan sadece username'i al, diğer bilgiler API'den gelecek
-      const basicUser = getUserFromToken(token);
+    // Token varsa user bilgisini backend'den çekeceğiz
+    // Şimdilik sadece token'ın varlığını kontrol ediyoruz
+    if (token) {
       return { 
         token, 
-        user: basicUser, // Sadece username içerir
-        isAuthenticated: true,
-        isLoading: true, // User data yüklenene kadar true
+        user: null, // User bilgisi App mount'ta fetch edilecek
+        isAuthenticated: true 
       };
     }
   } catch (e) {
-    console.error('Auth state initialization error:', e);
+    console.error('Token okuma hatası:', e);
   }
   
   return { 
     token: null, 
     user: null, 
-    isAuthenticated: false,
-    isLoading: false,
+    isAuthenticated: false 
   };
 };
 
 const authReducer = (state = getInitialState(), action) => {
   switch (action.type) {
     case LOGIN_SUCCESS:
-      // Login'de token'ı localStorage'a kaydet
-      if (action.payload.token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, action.payload.token);
-      }
       return {
         ...state,
         token: action.payload.token,
         user: action.payload.user,
         isAuthenticated: true,
-        isLoading: false,
       };
 
     case LOGOUT:
+      // Token'ı localStorage'dan sil
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      
       return { 
+        ...state, 
         token: null, 
         user: null, 
-        isAuthenticated: false,
-        isLoading: false,
+        isAuthenticated: false 
       };
       
     case UPDATE_USER_SUMMARY:
@@ -63,16 +61,8 @@ const authReducer = (state = getInitialState(), action) => {
           ...state.user,
           ...action.payload,
         },
-        isLoading: false,
       };
-
-    case SET_USER_DATA:
-      return {
-        ...state,
-        user: action.payload,
-        isLoading: false,
-      };
-
+      
     default:
       return state;
   }

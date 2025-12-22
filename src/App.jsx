@@ -1,94 +1,56 @@
-// src/App.jsx
-import React, { useEffect } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { HelmetProvider } from 'react-helmet-async';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Header from "./layout/Header";
+import Footer from "./layout/Footer";
+import PageContent from "./layout/PageContent";
+import { loginSuccess, logout } from "./redux/actions/authActions";
+import { STORAGE_KEYS } from "./api/axiosClient";
+import axiosClient from "./api/axiosClient";
 
-import store from './redux/store';
-import Header from './layout/Header';
-import Footer from './layout/Footer';
-import PageContent from './layout/PageContent';
-import { initializeAuth, checkTokenValidity } from './redux/thunks/authThunks';
-import { Loader2 } from 'lucide-react';
-
-// Auth Provider - Token kontrolü ve user data yükleme
-const AuthProvider = ({ children }) => {
+function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated, isLoading } = useSelector(state => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
+  // Uygulama yüklendiğinde token varsa user bilgisini backend'den çek
   useEffect(() => {
-    // Uygulama başlangıcında auth state'i initialize et
-    if (isAuthenticated) {
-      dispatch(initializeAuth());
-    }
-  }, []);
+    const initializeAuth = async () => {
+      const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+      
+      // Token varsa ama user bilgisi yoksa (sayfa yenilendiğinde)
+      if (token && !user) {
+        try {
+          // Backend'den mevcut kullanıcı bilgisini al
+          // Backend'inizde /api/auth/me veya /api/users/me endpoint'i olmalı
+          const response = await axiosClient.get('/auth/me');
+          
+          // User bilgisini Redux'a kaydet
+          dispatch(loginSuccess({ 
+            token, 
+            user: response.data 
+          }));
+        } catch (error) {
+          // Token geçersizse veya süresi dolmuşsa
+          console.error('Token doğrulama hatası:', error);
+          localStorage.removeItem(STORAGE_KEYS.TOKEN);
+          dispatch(logout());
+        }
+      }
+    };
 
-  // Token geçerliliğini periyodik kontrol et (her 5 dakikada)
-  useEffect(() => {
-    if (!isAuthenticated) return;
+    initializeAuth();
+  }, [dispatch, user]);
 
-    const interval = setInterval(() => {
-      dispatch(checkTokenValidity());
-    }, 5 * 60 * 1000); // 5 dakika
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, dispatch]);
-
-  // İlk yükleme sırasında loading göster
-  if (isAuthenticated && isLoading) {
-    return (
-      <div className="min-h-screen bg-mbg flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="animate-spin text-cta mx-auto mb-4" size={48} />
-          <p className="text-sti font-bold">Yükleniyor...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return children;
-};
-
-// Main App Layout
-const AppLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen flex flex-col font-display bg-mbg text-mtf">
       <Header />
-      <main className="flex-1">
+
+      <main className="flex-grow">
         <PageContent />
       </main>
+
       <Footer />
     </div>
   );
-};
-
-// Root App Component
-const App = () => {
-  return (
-    <Provider store={store}>
-      <HelmetProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <AppLayout />
-          </AuthProvider>
-          <ToastContainer 
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </BrowserRouter>
-      </HelmetProvider>
-    </Provider>
-  );
-};
+}
 
 export default App;

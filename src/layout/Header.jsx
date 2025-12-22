@@ -1,3 +1,4 @@
+// src/layout/Header.jsx - TAMAMEN YENİ
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,14 +20,13 @@ import {
   MapPinned,
   Settings,
   Shield,
-  Loader2,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { logout, updateUserSummary } from "../redux/actions/authActions";
 import { fetchUnreadCount } from "../redux/thunks/notificationThunks";
 import useAxios, { METHODS } from "../hooks/useAxios";
-import { clearAuthData } from "../api/axiosClient";
+import { STORAGE_KEYS } from "../api/axiosClient";
 import NotificationDropdown from "../components/common/NotificationDropdown";
 import SearchModal from "../components/common/SearchModal";
 
@@ -36,7 +36,7 @@ const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { unreadCount } = useSelector((state) => state.notifications);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ const Header = () => {
 
   // Kullanıcı bilgilerini ve bildirim sayısını güncelle
   useEffect(() => {
-    if (isAuthenticated && user?.username && !isLoading) {
+    if (isAuthenticated && user?.username) {
       sendRequest({
         url: `/users/summary/${user.username}`,
         method: METHODS.GET,
@@ -67,7 +67,7 @@ const Header = () => {
       });
       dispatch(fetchUnreadCount());
     }
-  }, [isAuthenticated, user?.username, isLoading]);
+  }, [isAuthenticated, user?.username, dispatch]);
 
   // Keyboard shortcut for search
   useEffect(() => {
@@ -81,20 +81,13 @@ const Header = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // ✅ DÜZELTME: Sadece TOKEN siliniyor
   const handleLogout = () => {
-    clearAuthData();
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
     dispatch(logout());
-    navigate("/giris");
+    navigate("/login");
     toast.info("Yolun açık olsun maceracı!");
     setIsUserMenuOpen(false);
-  };
-
-  // Profil sayfasına git
-  const goToProfile = () => {
-    if (user?.username) {
-      navigate(`/profil/${user.username}`);
-      setIsUserMenuOpen(false);
-    }
   };
 
   const navItems = [
@@ -160,25 +153,32 @@ const Header = () => {
                 to={item.href}
                 className={({ isActive }) => `
                   flex items-center gap-1.5 font-bold text-sm transition-colors py-2
-                  ${isActive ? 'text-cta' : 'text-mtf hover:text-cta'}
+                  ${isActive ? "text-cta" : "text-sti hover:text-cta"}
                 `}
               >
-                {item.icon}
+                <span className="text-cta/70 group-hover:text-cta">
+                  {item.icon}
+                </span>
                 {item.title}
-                {item.submenu && <ChevronDown size={14} className="ml-0.5" />}
+                {item.submenu && (
+                  <ChevronDown
+                    size={14}
+                    className="mt-0.5 group-hover:rotate-180 transition-transform"
+                  />
+                )}
               </NavLink>
-              
-              {/* Submenu */}
+
               {item.submenu && (
-                <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="bg-white border border-cbg rounded-xl shadow-xl py-2 min-w-[180px]">
-                    {item.submenu.map((sub, subIndex) => (
+                <div className="absolute top-16 left-0 w-48 bg-mbg border border-cbg rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 overflow-hidden z-50">
+                  <div className="h-1 w-full bg-cta"></div>
+                  <div className="flex flex-col p-1">
+                    {item.submenu.map((subItem, subIndex) => (
                       <Link
                         key={subIndex}
-                        to={sub.href}
-                        className="block px-4 py-2.5 text-sm font-bold text-mtf hover:bg-mbg hover:text-cta transition-colors"
+                        to={subItem.href}
+                        className="block px-4 py-2.5 text-sm font-semibold text-sti hover:bg-cbg/50 hover:text-cta rounded-lg transition-colors"
                       >
-                        {sub.title}
+                        {subItem.title}
                       </Link>
                     ))}
                   </div>
@@ -188,183 +188,262 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-3">
+        {/* RIGHT SIDE ACTIONS */}
+        <div className="hidden md:flex items-center gap-3 flex-shrink-0">
           {/* Search Button */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="p-2.5 rounded-xl text-sti hover:text-mtf hover:bg-cbg/50 transition-colors"
-            title="Ara (Ctrl+K)"
+            className="flex items-center gap-2 px-3 py-2 text-sti hover:text-mtf hover:bg-cbg/50 rounded-xl transition-colors group"
+            title="Ara (⌘K)"
           >
-            <Search size={20} />
+            <Search size={18} />
+            <span className="text-xs font-medium text-sti/50 group-hover:text-sti hidden lg:block">
+              ⌘K
+            </span>
           </button>
 
-          {isAuthenticated ? (
-            <>
-              {/* Notifications */}
+          <div className="h-6 w-px bg-cbg"></div>
+
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-3">
+              {/* Notification Bell */}
               <div className="relative">
                 <button
                   onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                  className="p-2.5 rounded-xl text-sti hover:text-mtf hover:bg-cbg/50 transition-colors relative"
+                  className="relative p-2 text-sti hover:text-mtf hover:bg-cbg/50 rounded-xl transition-colors"
                 >
                   <Bell size={20} />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 bg-cta text-white text-[10px] font-black rounded-full flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-cta text-white text-[10px] font-black rounded-full px-1 animate-pulse">
+                      {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                   )}
                 </button>
-                
-                {isNotificationOpen && (
-                  <NotificationDropdown onClose={() => setIsNotificationOpen(false)} />
-                )}
+                <NotificationDropdown
+                  isOpen={isNotificationOpen}
+                  onClose={() => setIsNotificationOpen(false)}
+                />
               </div>
 
               {/* User Menu */}
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 p-1.5 pr-3 rounded-xl hover:bg-cbg/50 transition-colors"
+                  className="flex items-center gap-2.5 p-1.5 pr-3 rounded-xl hover:bg-cbg/50 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-cta/10 overflow-hidden flex items-center justify-center">
-                    {isLoading ? (
-                      <Loader2 size={18} className="text-cta animate-spin" />
-                    ) : user?.avatarUrl ? (
-                      <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cta/20 to-purple-500/20 border-2 border-cbg overflow-hidden">
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.username}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
-                      <UserIcon size={18} className="text-cta" />
+                      <div className="w-full h-full flex items-center justify-center text-cta font-black text-sm">
+                        {user.displayName?.charAt(0) ||
+                          user.username?.charAt(0)}
+                      </div>
                     )}
                   </div>
-                  <span className="hidden sm:block font-bold text-sm text-mtf max-w-[100px] truncate">
-                    {user?.displayName || user?.username || 'Kullanıcı'}
-                  </span>
-                  <ChevronDown size={14} className="text-sti" />
+                  <div className="hidden lg:block text-left">
+                    <p className="text-sm font-bold text-mtf leading-tight">
+                      {user.displayName || user.username}
+                    </p>
+                    <p className="text-[10px] text-sti font-medium">
+                      {user.title || "Maceracı"}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    size={16}
+                    className={`text-sti transition-transform ${
+                      isUserMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
-                {/* User Dropdown */}
                 {isUserMenuOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-cbg rounded-xl shadow-xl py-2 z-50">
-                    {/* User Info */}
-                    <div className="px-4 py-3 border-b border-cbg">
-                      <p className="font-black text-mtf truncate">
-                        {user?.displayName || user?.username}
+                  <div className="absolute top-14 right-0 w-64 bg-mbg border border-cbg rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in">
+                    <div className="h-1 w-full bg-gradient-to-r from-cta to-purple-500"></div>
+
+                    {/* User Info Header */}
+                    <div className="p-4 bg-cbg/30 border-b border-cbg">
+                      <p className="text-sm font-black text-mtf">
+                        {user.displayName || user.username}
                       </p>
-                      <p className="text-xs text-sti">@{user?.username}</p>
-                      {user?.rankTitle && (
-                        <span className="inline-block mt-1 px-2 py-0.5 bg-cta/10 text-cta text-[10px] font-black rounded uppercase">
-                          {user.rankTitle}
-                        </span>
+                      <p className="text-xs text-sti">@{user.username}</p>
+                      {user.currentXp !== undefined && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-cbg rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-cta rounded-full"
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  user.currentXp % 100
+                                )}%`,
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-[10px] font-bold text-cta">
+                            {user.currentXp} XP
+                          </span>
+                        </div>
                       )}
                     </div>
 
-                    {/* Menu Items */}
-                    <div className="py-2">
-                      <button
-                        onClick={goToProfile}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-mtf hover:bg-mbg hover:text-cta transition-colors text-left"
+                    <div className="p-2">
+                      {/* ✅ DÜZELTME: /profile yerine /profil */}
+                      <Link
+                        to={`/profil/${user.username}`}
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sti hover:bg-cbg/50 hover:text-mtf rounded-lg transition-colors"
                       >
-                        <UserIcon size={16} />
-                        Profilim
-                      </button>
+                        <UserIcon size={16} /> Profilim
+                      </Link>
+                      <Link
+                        to="/collections/me"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sti hover:bg-cbg/50 hover:text-mtf rounded-lg transition-colors"
+                      >
+                        <ScrollText size={16} /> Koleksiyonlarım
+                      </Link>
                       <Link
                         to="/ayarlar"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-mtf hover:bg-mbg hover:text-cta transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sti hover:bg-cbg/50 hover:text-mtf rounded-lg transition-colors"
                       >
-                        <Settings size={16} />
-                        Ayarlar
+                        <Settings size={16} /> Ayarlar
                       </Link>
-                      
-                      {/* Admin Link (if user is admin) */}
-                      {user?.roles?.includes('ROLE_ADMIN') && (
+
+                      {/* Admin Link */}
+                      {user.roles?.includes("ROLE_ADMIN") && (
                         <Link
                           to="/admin"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-purple-600 hover:bg-purple-50 transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                         >
-                          <Shield size={16} />
-                          Admin Panel
+                          <Shield size={16} /> Admin Panel
                         </Link>
                       )}
-                    </div>
 
-                    {/* Logout */}
-                    <div className="border-t border-cbg pt-2">
+                      <div className="h-px bg-cbg mx-2 my-1"></div>
+
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors text-left"
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                       >
-                        <LogOut size={16} />
-                        Çıkış Yap
+                        <LogOut size={16} /> Çıkış Yap
                       </button>
                     </div>
                   </div>
                 )}
               </div>
-            </>
+            </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link
-                to="/giris"
-                className="px-4 py-2 text-sm font-bold text-mtf hover:text-cta transition-colors"
+                to="/register"
+                className="text-sti hover:text-mtf font-bold text-sm px-2"
               >
-                Giriş
+                Kayıt Ol
               </Link>
               <Link
-                to="/kayit"
-                className="px-4 py-2 bg-cta text-white text-sm font-bold rounded-xl hover:bg-cta-hover transition-colors"
+                to="/login"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pb text-td hover:bg-cta hover:text-white transition-all duration-300 font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5"
+              >
+                <UserIcon size={18} /> Giriş Yap
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* MOBILE MENU TOGGLE */}
+        <button
+          className="xl:hidden p-2 text-sti hover:text-mtf hover:bg-cbg rounded-lg transition-colors"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+      </div>
+
+      {/* MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div className="xl:hidden absolute top-20 left-0 w-full bg-mbg border-b border-cbg p-6 flex flex-col gap-2 shadow-xl animate-fade-in z-40 max-h-[80vh] overflow-y-auto">
+          {/* Mobile Search */}
+          <button
+            onClick={() => {
+              setIsSearchOpen(true);
+              setIsMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-3 p-3 text-sti font-bold text-lg hover:bg-cbg/50 rounded-lg mb-2"
+          >
+            <Search size={20} className="text-cta" />
+            Ara...
+          </button>
+
+          {navItems.map((item, index) => (
+            <div key={index}>
+              <Link
+                to={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 text-mtf font-bold text-lg hover:bg-cbg/50 rounded-lg"
+              >
+                <span className="text-cta">{item.icon}</span>
+                {item.title}
+              </Link>
+
+              {item.submenu && (
+                <div className="pl-12 flex flex-col gap-1 mt-1 border-l-2 border-cbg ml-6">
+                  {item.submenu.map((sub, i) => (
+                    <Link
+                      key={i}
+                      to={sub.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="py-2 px-2 text-sti font-medium text-sm hover:text-cta block"
+                    >
+                      {sub.title}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+
+          <div className="h-px bg-cbg my-4"></div>
+
+          {!isAuthenticated ? (
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full py-3 rounded-xl bg-pb text-td font-bold text-center flex items-center justify-center gap-2"
+              >
+                <UserIcon size={18} /> Giriş Yap
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full py-3 rounded-xl border border-cbg text-sti font-bold text-center hover:text-cta"
               >
                 Kayıt Ol
               </Link>
             </div>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="w-full py-3 rounded-xl bg-red-500/10 text-red-500 font-bold text-center flex items-center justify-center gap-2"
+            >
+              <LogOut size={18} /> Çıkış Yap
+            </button>
           )}
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="xl:hidden p-2.5 rounded-xl text-mtf hover:bg-cbg/50 transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="xl:hidden absolute top-full left-0 w-full bg-white border-b border-cbg shadow-xl">
-          <nav className="container mx-auto px-4 py-4 space-y-1">
-            {navItems.map((item, index) => (
-              <div key={index}>
-                <Link
-                  to={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-mtf font-bold hover:bg-mbg hover:text-cta transition-colors"
-                >
-                  {item.icon}
-                  {item.title}
-                </Link>
-                {item.submenu && (
-                  <div className="ml-8 space-y-1">
-                    {item.submenu.map((sub, subIndex) => (
-                      <Link
-                        key={subIndex}
-                        to={sub.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="block px-4 py-2 text-sm text-sti hover:text-cta transition-colors"
-                      >
-                        {sub.title}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
         </div>
       )}
 
       {/* Search Modal */}
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
     </header>
   );
 };
