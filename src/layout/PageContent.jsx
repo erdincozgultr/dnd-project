@@ -13,22 +13,17 @@ import MyCollectionsPage from "../pages/MyCollectionsPage";
 import ProfilePage from "../pages/ProfilePage";
 import TavernaPage from "../pages/TavernaPage";
 import LeaderboardPage from "../pages/LeaderboardPage";
-
-// Taverna Alt Sayfaları
 import GuildsPage from "../pages/GuildsPage";
 import GuildDetailPage from "../pages/GuildDetailPage";
 import CreateGuildPage from "../pages/CreateGuildPage";
 import BadgesPage from "../pages/BadgesPage";
-
-// Bit Pazarı (Marketplace)
 import MarketplacePage from "../pages/MarketplacePage";
 import ListingDetailPage from "../pages/ListingDetailPage";
 import CreateListingPage from "../pages/CreateListingPage";
-
-// Dost Mekanlar (Venues) - YENİ TASARIM
 import VenuesPage from "../pages/VenuesPage";
 import VenueDetailPage from "../pages/VenueDetailPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
+import NotificationsPage from "../pages/NotificationsPage"
 
 const PageContent = () => {
   return (
@@ -82,6 +77,10 @@ const PageContent = () => {
       <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
       <Route path="/kampanya-duzenle/:id" element={<CreateCampaignPage />} />
       <Route path="/create-campaign" element={<Navigate to="/kampanya-olustur" replace />} />
+
+           {/* Notifications */}
+      <Route path="/bildirimler" element={<NotificationsPage />} />
+      <Route path="/notifications" element={<Navigate to="/bildirimler" replace />} />
 
       {/* Auth */}
       <Route path="/giris" element={<LoginPage />} />

@@ -1,10 +1,9 @@
-// src/components/common/NotificationDropdown.jsx
 import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { 
-  Bell, Check, CheckCheck, Trash2, ExternalLink,
-  MessageSquare, Heart, Award, Users, AlertCircle, Settings
+  Bell, Check, CheckCheck, ExternalLink,
+  MessageSquare, Heart, Award, Users, AlertCircle
 } from 'lucide-react';
 import { 
   fetchNotifications, 
@@ -44,6 +43,8 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
       SYSTEM: <AlertCircle size={16} className="text-cta" />,
       CONTENT_APPROVED: <Check size={16} className="text-green-500" />,
       CONTENT_REJECTED: <AlertCircle size={16} className="text-red-500" />,
+      CAMPAIGN_INVITE: <Users size={16} className="text-indigo-500" />,
+      CAMPAIGN_UPDATE: <Bell size={16} className="text-cta" />,
     };
     return icons[type] || <Bell size={16} className="text-sti" />;
   };
@@ -141,9 +142,9 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
 
               {/* Actions */}
               <div className="flex-shrink-0 flex items-center gap-1">
-                {notification.link && (
+                {notification.relatedLink && (
                   <Link 
-                    to={notification.link}
+                    to={notification.relatedLink}
                     onClick={(e) => e.stopPropagation()}
                     className="p-1.5 text-sti hover:text-cta hover:bg-cta/10 rounded-lg transition-colors"
                   >
@@ -168,7 +169,7 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
       {notifications.length > 0 && (
         <div className="bg-cbg/30 px-4 py-3 text-center border-t border-cbg">
           <Link 
-            to="/notifications" 
+            to="/bildirimler" 
             onClick={onClose}
             className="text-xs font-bold text-cta hover:underline uppercase tracking-wide"
           >

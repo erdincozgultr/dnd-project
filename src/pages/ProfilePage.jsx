@@ -75,7 +75,7 @@ const ProfilePage = () => {
         {/* Edit Button */}
         {isOwnProfile && (
           <Link 
-            to="/settings/profile"
+             to={`/ayarlar`}
             className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm text-white text-sm font-bold rounded-xl border border-white/20 hover:bg-cta hover:border-cta transition-all"
           >
             <Edit3 size={16} /> Profili Düzenle
