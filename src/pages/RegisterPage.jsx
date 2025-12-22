@@ -4,22 +4,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet-async';
-import { Mail, Lock, User, Feather, ShieldCheck, UserCircle } from 'lucide-react';
+import { Mail, Lock, User, Feather, UserCircle, Loader2, AlertCircle } from 'lucide-react';
 
 import useAxios, { METHODS } from '../hooks/useAxios';
 import { loginSuccess } from '../redux/actions/authActions';
-import { STORAGE_KEYS } from '../api/axiosClient';
 
 const RegisterPage = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  const { sendRequest, loading, error } = useAxios();
+  const { sendRequest, loading } = useAxios();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const password = watch("password");
 
   const onSubmit = (data) => {
-    // Backend: UserRequestDto (username, email, password, displayName)
     sendRequest({
       url: '/auth/register',
       method: METHODS.POST,
@@ -27,22 +25,20 @@ const RegisterPage = () => {
         username: data.username,
         email: data.email,
         password: data.password,
-        displayName: data.displayName
+        displayName: data.displayName || data.username
       },
       callbackSuccess: (res) => {
-        // Backend: AuthResponseDto
         const { accessToken, user } = res.data;
         
-        if(accessToken) {
-             localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
-             localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-             dispatch(loginSuccess({ token: accessToken, user }));
-             toast.success("Anlaşma mühürlendi! Aramıza hoş geldin.");
-             navigate('/');
+        if (accessToken) {
+          // Redux'a login bilgisini gönder (localStorage kaydı reducer'da yapılıyor)
+          dispatch(loginSuccess({ token: accessToken, user }));
+          toast.success("Anlaşma mühürlendi! Aramıza hoş geldin.");
+          navigate('/');
         } else {
-             // Token dönmezse login sayfasına yönlendirme (opsiyonel akış)
-             toast.success("Kayıt Başarılı! Lütfen giriş yap.");
-             navigate('/login');
+          // Token dönmezse login sayfasına yönlendirme
+          toast.success("Kayıt başarılı! Lütfen giriş yap.");
+          navigate('/giris');
         }
       }
     });
@@ -54,7 +50,197 @@ const RegisterPage = () => {
         <title>Kayıt Ol | Zar & Kule</title>
       </Helmet>
 
-      <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-pb order-last">
+      {/* Sol taraf - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-black text-mtf mb-2">Kayıt Ol</h1>
+            <p className="text-sti text-sm">
+              Zaten hesabın var mı?{' '}
+              <Link to="/giris" className="text-cta font-bold hover:underline">
+                Giriş yap
+              </Link>
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Username */}
+            <div>
+              <label className="block text-[10px] font-black text-sti uppercase tracking-wider mb-2">
+                Kullanıcı Adı *
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-sti" size={18} />
+                <input
+                  {...register('username', { 
+                    required: 'Kullanıcı adı gerekli',
+                    minLength: { value: 3, message: 'En az 3 karakter' },
+                    maxLength: { value: 20, message: 'En fazla 20 karakter' },
+                    pattern: { 
+                      value: /^[a-zA-Z0-9_]+$/, 
+                      message: 'Sadece harf, rakam ve alt çizgi' 
+                    }
+                  })}
+                  type="text"
+                  placeholder="maceraci_42"
+                  className="w-full pl-12 pr-4 py-4 bg-mbg border border-cbg rounded-xl text-mtf font-bold focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all"
+                />
+              </div>
+              {errors.username && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.username.message}
+                </p>
+              )}
+            </div>
+
+            {/* Display Name */}
+            <div>
+              <label className="block text-[10px] font-black text-sti uppercase tracking-wider mb-2">
+                Görünen İsim
+              </label>
+              <div className="relative">
+                <UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-sti" size={18} />
+                <input
+                  {...register('displayName', {
+                    maxLength: { value: 30, message: 'En fazla 30 karakter' }
+                  })}
+                  type="text"
+                  placeholder="Aragorn (opsiyonel)"
+                  className="w-full pl-12 pr-4 py-4 bg-mbg border border-cbg rounded-xl text-mtf font-bold focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all"
+                />
+              </div>
+              {errors.displayName && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.displayName.message}
+                </p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-[10px] font-black text-sti uppercase tracking-wider mb-2">
+                E-posta *
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-sti" size={18} />
+                <input
+                  {...register('email', { 
+                    required: 'E-posta gerekli',
+                    pattern: { 
+                      value: /^\S+@\S+$/i, 
+                      message: 'Geçerli bir e-posta girin' 
+                    }
+                  })}
+                  type="email"
+                  placeholder="maceraci@zarvekule.com"
+                  className="w-full pl-12 pr-4 py-4 bg-mbg border border-cbg rounded-xl text-mtf font-bold focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-[10px] font-black text-sti uppercase tracking-wider mb-2">
+                Şifre *
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-sti" size={18} />
+                <input
+                  {...register('password', { 
+                    required: 'Şifre gerekli',
+                    minLength: { value: 6, message: 'En az 6 karakter' }
+                  })}
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-4 py-4 bg-mbg border border-cbg rounded-xl text-mtf font-bold focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all"
+                />
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-[10px] font-black text-sti uppercase tracking-wider mb-2">
+                Şifre Tekrar *
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-sti" size={18} />
+                <input
+                  {...register('confirmPassword', { 
+                    required: 'Şifre tekrarı gerekli',
+                    validate: value => value === password || 'Şifreler eşleşmiyor'
+                  })}
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-4 py-4 bg-mbg border border-cbg rounded-xl text-mtf font-bold focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all"
+                />
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-start gap-3">
+              <input
+                {...register('terms', { required: 'Koşulları kabul etmelisin' })}
+                type="checkbox"
+                className="w-5 h-5 mt-0.5 rounded border-cbg text-cta focus:ring-cta"
+              />
+              <label className="text-sm text-sti">
+                <Link to="/kullanim-kosullari" className="text-cta hover:underline">
+                  Kullanım koşullarını
+                </Link>{' '}
+                ve{' '}
+                <Link to="/gizlilik" className="text-cta hover:underline">
+                  gizlilik politikasını
+                </Link>{' '}
+                okudum ve kabul ediyorum.
+              </label>
+            </div>
+            {errors.terms && (
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle size={12} /> {errors.terms.message}
+              </p>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`
+                w-full py-4 rounded-xl font-black text-white uppercase tracking-wider 
+                flex items-center justify-center gap-2 transition-all
+                ${loading 
+                  ? 'bg-cbg cursor-not-allowed' 
+                  : 'bg-cta hover:bg-cta-hover shadow-lg shadow-cta/30 hover:shadow-cta/50'}
+              `}
+            >
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  <Feather size={18} /> Mühürü Bas
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Sağ taraf - Görsel */}
+      <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-pb">
         <img 
           src="https://i.pinimg.com/1200x/58/1e/52/581e52a340c65ca9d0cefca047070f47.jpg" 
           alt="Ancient Contract" 
@@ -68,139 +254,9 @@ const RegisterPage = () => {
             Kaderini <br/> İmzala
           </h2>
           <p className="text-lg text-white/70 max-w-md leading-relaxed">
-            Bu sadece bir başlangıç. Kendi efsaneni yazmak, loncalara katılmak ve kadim bilgilere erişmek için mühürü bas.
+            Bu sadece bir başlangıç. Kendi efsaneni yazmak, loncalara katılmak 
+            ve kadim bilgilere erişmek için mühürü bas.
           </p>
-        </div>
-      </div>
-
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative order-first">
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] pointer-events-none"></div>
-
-        <div className="w-full max-w-md">
-          
-          <div className="mb-10">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-cta/10 text-cta text-xs font-bold rounded-full mb-4">
-                <ShieldCheck size={14} /> YENİ MACERACI
-             </div>
-            <h1 className="text-4xl font-black text-mtf mb-2">Hesap Oluştur</h1>
-            <p className="text-sti text-sm">
-              Zaten bir hesabın var mı?{' '}
-              <Link to="/login" className="font-bold text-cta hover:underline">
-                Giriş Yap
-              </Link>
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            
-            {/* Kullanıcı Adı (YENİ ALAN) */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-mtf uppercase tracking-wider ml-1">Kullanıcı Adı (Unique)</label>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  {...register("username", { 
-                    required: "Kullanıcı adı gerekli",
-                    minLength: { value: 3, message: "En az 3 karakter olmalı" },
-                    maxLength: { value: 20, message: "En çok 20 karakter olmalı" }
-                  })}
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-cbg rounded-xl focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all text-mtf"
-                  placeholder="KullaniciAdi123"
-                />
-                <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-sti/50" size={18} />
-              </div>
-              {errors.username && <span className="text-xs text-red-500 ml-1">{errors.username.message}</span>}
-            </div>
-
-            {/* Display Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-mtf uppercase tracking-wider ml-1">Görünen İsim (RP Adı)</label>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  {...register("displayName", { required: "Bir isim seçmelisin" })}
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-cbg rounded-xl focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all text-mtf"
-                  placeholder="Örn: Gandalf"
-                />
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-sti/50" size={18} />
-              </div>
-              {errors.displayName && <span className="text-xs text-red-500 ml-1">{errors.displayName.message}</span>}
-            </div>
-
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-mtf uppercase tracking-wider ml-1">Email</label>
-              <div className="relative">
-                <input 
-                  type="email" 
-                  {...register("email", { 
-                    required: "Email gerekli",
-                    pattern: { value: /^\S+@\S+$/i, message: "Geçersiz email formatı" }
-                  })}
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-cbg rounded-xl focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all text-mtf"
-                  placeholder="buyucu@kule.com"
-                />
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-sti/50" size={18} />
-              </div>
-              {errors.email && <span className="text-xs text-red-500 ml-1">{errors.email.message}</span>}
-            </div>
-
-            {/* Şifre */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-mtf uppercase tracking-wider ml-1">Şifre</label>
-              <div className="relative">
-                <input 
-                  type="password" 
-                  {...register("password", { 
-                    required: "Şifre gerekli",
-                    minLength: { value: 6, message: "En az 6 karakter olmalı" }
-                  })}
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-cbg rounded-xl focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all text-mtf"
-                  placeholder="••••••••"
-                />
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-sti/50" size={18} />
-              </div>
-              {errors.password && <span className="text-xs text-red-500 ml-1">{errors.password.message}</span>}
-            </div>
-
-            {/* Şifre Tekrar */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-mtf uppercase tracking-wider ml-1">Şifre Onayı</label>
-              <div className="relative">
-                <input 
-                  type="password" 
-                  {...register("confirmPassword", { 
-                    validate: val => val === password || "Şifreler eşleşmiyor"
-                  })}
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-cbg rounded-xl focus:border-cta focus:ring-1 focus:ring-cta outline-none transition-all text-mtf"
-                  placeholder="••••••••"
-                />
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-sti/50" size={18} />
-              </div>
-              {errors.confirmPassword && <span className="text-xs text-red-500 ml-1">{errors.confirmPassword.message}</span>}
-            </div>
-
-            <button 
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-cta text-white py-4 rounded-xl font-bold text-lg hover:bg-pb transition-all shadow-xl hover:shadow-cta/20 hover:-translate-y-1 disabled:opacity-70 mt-4"
-            >
-              {loading ? 'Parşömen Hazırlanıyor...' : (
-                <>
-                  <Feather size={20} className="animate-pulse" /> Anlaşmayı İmzala
-                </>
-              )}
-            </button>
-
-            <p className="text-[10px] text-sti/60 text-center px-4">
-              Kaydolarak <a href="#" className="underline hover:text-cta">Kule Kuralları</a>'nı ve <a href="#" className="underline hover:text-cta">Gizlilik Büyüsü</a>'nü kabul etmiş olursun.
-            </p>
-
-          </form>
-
         </div>
       </div>
     </div>
