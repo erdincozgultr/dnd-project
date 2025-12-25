@@ -21,7 +21,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     sendRequest({
-      url: `/profile/${username}`,
+      url: `/users/profile/${username}`,
       method: METHODS.GET,
       callbackSuccess: (res) => setProfile(res.data),
     });

@@ -292,7 +292,6 @@ const Header = () => {
                     </div>
 
                     <div className="p-2">
-                      {/* ✅ DÜZELTME: /profile yerine /profil */}
                       <Link
                         to={`/profil/${user.username}`}
                         onClick={() => setIsUserMenuOpen(false)}

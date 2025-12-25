@@ -1,24 +1,38 @@
 // src/pages/GuildDetailPage.jsx
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { 
-  Shield, Users, Crown, ChevronLeft, TrendingUp, Star,
-  Loader2, Settings, LogOut, UserPlus, Award, Calendar,
-  MessageSquare, Flame, ChevronRight, Edit3, Trash2
-} from 'lucide-react';
-import useAxios, { METHODS } from '../hooks/useAxios';
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import {
+  Shield,
+  Users,
+  Crown,
+  ChevronLeft,
+  TrendingUp,
+  Star,
+  Loader2,
+  Settings,
+  LogOut,
+  UserPlus,
+  Award,
+  Calendar,
+  MessageSquare,
+  Flame,
+  ChevronRight,
+  Edit3,
+  Trash2,
+} from "lucide-react";
+import useAxios, { METHODS } from "../hooks/useAxios";
 
 const GuildDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useSelector(state => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { sendRequest, loading } = useAxios();
-  
+
   const [guild, setGuild] = useState(null);
-  const [activeTab, setActiveTab] = useState('members');
+  const [activeTab, setActiveTab] = useState("members");
 
   useEffect(() => {
     sendRequest({
@@ -26,9 +40,9 @@ const GuildDetailPage = () => {
       method: METHODS.GET,
       callbackSuccess: (res) => setGuild(res.data),
       callbackError: () => {
-        toast.error('Lonca bulunamadı.');
-        navigate('/taverna/loncalar');
-      }
+        toast.error("Lonca bulunamadı.");
+        navigate("/taverna/loncalar");
+      },
     });
   }, [id]);
 
@@ -40,43 +54,52 @@ const GuildDetailPage = () => {
     );
   }
 
-  const isLeader = user?.username === guild.leader?.username;
-  const isMember = guild.members?.some(m => m.username === user?.username) || isLeader;
+  const isLeader =
+    guild.currentUserIsLeader || user?.username === guild.leader?.username;
+  const isMember =
+    guild.currentUserIsMember ||
+    guild.members?.some((m) => m.username === user?.username) ||
+    isLeader;
 
   const handleJoin = () => {
     sendRequest({
       url: `/guilds/${id}/join`,
       method: METHODS.POST,
       callbackSuccess: () => {
-        toast.success('Loncaya katıldın!');
+        toast.success("Loncaya katıldın!");
         window.location.reload();
-      }
+      },
     });
   };
 
   const handleLeave = () => {
-    if (!window.confirm('Loncadan ayrılmak istediğine emin misin?')) return;
-    
+    if (!window.confirm("Loncadan ayrılmak istediğine emin misin?")) return;
+
     sendRequest({
       url: `/guilds/${id}/leave`,
       method: METHODS.POST,
       callbackSuccess: () => {
-        toast.success('Loncadan ayrıldın.');
-        navigate('/taverna/loncalar');
-      }
+        toast.success("Loncadan ayrıldın.");
+        navigate("/taverna/loncalar");
+      },
     });
   };
 
   const handleDelete = () => {
-    if (!window.confirm('Loncayı silmek istediğine emin misin? Bu işlem geri alınamaz!')) return;
-    
+    if (
+      !window.confirm(
+        "Loncayı silmek istediğine emin misin? Bu işlem geri alınamaz!"
+      )
+    )
+      return;
+
     sendRequest({
       url: `/guilds/${id}`,
       method: METHODS.DELETE,
       callbackSuccess: () => {
-        toast.success('Lonca silindi.');
-        navigate('/taverna/loncalar');
-      }
+        toast.success("Lonca silindi.");
+        navigate("/taverna/loncalar");
+      },
     });
   };
 
@@ -90,16 +113,18 @@ const GuildDetailPage = () => {
 
       {/* Hero Banner */}
       <div className="relative h-64 md:h-80 overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/77/a0/66/77a066581f52577684ebf61a2c7327f2.jpg')` }}
+          style={{
+            backgroundImage: `url('https://i.pinimg.com/736x/77/a0/66/77a066581f52577684ebf61a2c7327f2.jpg')`,
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-mbg via-purple-900/70 to-purple-900/50" />
-        
+
         {/* Back Button */}
         <div className="absolute top-6 left-6">
-          <Link 
-            to="/taverna/loncalar" 
+          <Link
+            to="/taverna/loncalar"
             className="flex items-center gap-2 px-4 py-2 bg-black/30 backdrop-blur-sm text-white rounded-xl hover:bg-black/50 transition-colors"
           >
             <ChevronLeft size={18} />
@@ -110,7 +135,7 @@ const GuildDetailPage = () => {
         {/* Edit Button */}
         {isLeader && (
           <div className="absolute top-6 right-6">
-            <Link 
+            <Link
               to={`/taverna/loncalar/${id}/duzenle`}
               className="flex items-center gap-2 px-4 py-2 bg-black/30 backdrop-blur-sm text-white rounded-xl hover:bg-purple-500 transition-colors"
             >
@@ -136,31 +161,38 @@ const GuildDetailPage = () => {
               {/* Guild Info */}
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3 mb-2">
-                  <h1 className="text-2xl md:text-3xl font-black text-mtf">{guild.name}</h1>
+                  <h1 className="text-2xl md:text-3xl font-black text-mtf">
+                    {guild.name}
+                  </h1>
                   <span className="px-3 py-1 bg-purple-500/10 text-purple-600 font-black text-sm rounded-lg">
                     Seviye {guild.level || 1}
                   </span>
                 </div>
 
                 <p className="text-sti mb-4 max-w-2xl">
-                  {guild.description || 'Bu lonca henüz bir açıklama eklememiş.'}
+                  {guild.description ||
+                    "Bu lonca henüz bir açıklama eklememiş."}
                 </p>
 
                 {/* Stats Row */}
                 <div className="flex flex-wrap items-center gap-6 mb-4">
                   <div className="flex items-center gap-2">
                     <Users size={18} className="text-purple-500" />
-                    <span className="font-bold text-mtf">{guild.memberCount || guild.members?.length || 0}</span>
+                    <span className="font-bold text-mtf">
+                      {guild.memberCount || guild.members?.length || 0}
+                    </span>
                     <span className="text-sti text-sm">üye</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp size={18} className="text-green-500" />
-                    <span className="font-bold text-mtf">{(guild.xp || 0).toLocaleString()}</span>
+                    <span className="font-bold text-mtf">
+                      {(guild.xp || 0).toLocaleString()}
+                    </span>
                     <span className="text-sti text-sm">XP</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Crown size={18} className="text-yellow-500" />
-                    <Link 
+                    <Link
                       to={`/profil/${guild.leader?.username}`}
                       className="font-bold text-mtf hover:text-purple-600 transition-colors"
                     >
@@ -173,11 +205,15 @@ const GuildDetailPage = () => {
                 {/* XP Progress Bar */}
                 <div className="max-w-md">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-sti font-medium">Sonraki seviyeye</span>
-                    <span className="text-purple-600 font-bold">{1000 - ((guild.xp || 0) % 1000)} XP</span>
+                    <span className="text-sti font-medium">
+                      Sonraki seviyeye
+                    </span>
+                    <span className="text-purple-600 font-bold">
+                      {1000 - ((guild.xp || 0) % 1000)} XP
+                    </span>
                   </div>
                   <div className="h-2 bg-cbg rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all"
                       style={{ width: `${xpProgress}%` }}
                     />
@@ -195,7 +231,7 @@ const GuildDetailPage = () => {
                     <UserPlus size={18} /> Katıl
                   </button>
                 )}
-                
+
                 {isMember && !isLeader && (
                   <button
                     onClick={handleLeave}
@@ -223,32 +259,34 @@ const GuildDetailPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto">
-          {['members', 'activity', 'achievements'].map((tab) => (
+          {["members", "activity", "achievements"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`
                 px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all
-                ${activeTab === tab 
-                  ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20' 
-                  : 'bg-white border border-cbg text-sti hover:text-mtf'}
+                ${
+                  activeTab === tab
+                    ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
+                    : "bg-white border border-cbg text-sti hover:text-mtf"
+                }
               `}
             >
-              {tab === 'members' && 'Üyeler'}
-              {tab === 'activity' && 'Aktivite'}
-              {tab === 'achievements' && 'Başarılar'}
+              {tab === "members" && "Üyeler"}
+              {tab === "activity" && "Aktivite"}
+              {tab === "achievements" && "Başarılar"}
             </button>
           ))}
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'members' && (
+        {activeTab === "members" && (
           <div className="bg-white border border-cbg rounded-2xl p-6">
             <h3 className="text-lg font-black text-mtf mb-4 flex items-center gap-2">
               <Users size={20} className="text-purple-500" />
               Üyeler ({guild.members?.length || 0})
             </h3>
-            
+
             {guild.members?.length === 0 ? (
               <p className="text-sti text-center py-8">Henüz üye yok.</p>
             ) : (
@@ -258,15 +296,17 @@ const GuildDetailPage = () => {
                   <MemberCard member={guild.leader} isLeader={true} />
                 )}
                 {/* Other Members */}
-                {guild.members?.filter(m => m.username !== guild.leader?.username).map((member) => (
-                  <MemberCard key={member.id} member={member} />
-                ))}
+                {guild.members
+                  ?.filter((m) => m.username !== guild.leader?.username)
+                  .map((member) => (
+                    <MemberCard key={member.id} member={member} />
+                  ))}
               </div>
             )}
           </div>
         )}
 
-        {activeTab === 'activity' && (
+        {activeTab === "activity" && (
           <div className="bg-white border border-cbg rounded-2xl p-6">
             <h3 className="text-lg font-black text-mtf mb-4 flex items-center gap-2">
               <Flame size={20} className="text-cta" />
@@ -276,7 +316,7 @@ const GuildDetailPage = () => {
           </div>
         )}
 
-        {activeTab === 'achievements' && (
+        {activeTab === "achievements" && (
           <div className="bg-white border border-cbg rounded-2xl p-6">
             <h3 className="text-lg font-black text-mtf mb-4 flex items-center gap-2">
               <Award size={20} className="text-yellow-500" />
@@ -298,7 +338,11 @@ const MemberCard = ({ member, isLeader = false }) => (
   >
     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border-2 border-cbg overflow-hidden flex-shrink-0">
       {member.avatarUrl ? (
-        <img src={member.avatarUrl} alt={member.username} className="w-full h-full object-cover" />
+        <img
+          src={member.avatarUrl}
+          alt={member.username}
+          className="w-full h-full object-cover"
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center text-purple-500 font-black">
           {member.displayName?.charAt(0) || member.username?.charAt(0)}
@@ -311,9 +355,7 @@ const MemberCard = ({ member, isLeader = false }) => (
       </p>
       <p className="text-xs text-sti truncate">@{member.username}</p>
     </div>
-    {isLeader && (
-      <Crown size={18} className="text-yellow-500 flex-shrink-0" />
-    )}
+    {isLeader && <Crown size={18} className="text-yellow-500 flex-shrink-0" />}
   </Link>
 );
 
