@@ -1,3 +1,5 @@
+// src/pages/WikiDetailPage.jsx
+
 import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,7 +50,6 @@ const WikiDetailPage = () => {
       toast.info("Koleksiyona eklemek için giriş yapmalısın.");
       return;
     }
-    // TODO: Koleksiyon modal aç
     toast.info("Koleksiyon özelliği yakında!");
   };
 
@@ -152,10 +153,13 @@ const WikiDetailPage = () => {
           {/* Sol: İçerik */}
           <div className="lg:col-span-2">
             <div className="bg-white border border-cbg rounded-2xl p-6 shadow-sm">
-              {/* Kategori bazlı detay component */}
+              {/* 
+                Sadece turkishContent kullanılıyor!
+                metadata backend'de referans için tutulsa da frontend'e gönderilmiyor 
+                veya kullanılmıyor.
+              */}
               <CategoryDetail 
                 category={currentEntry.category}
-                metadata={currentEntry.metadata}
                 turkishContent={currentEntry.turkishContent}
               />
             </div>
@@ -220,14 +224,6 @@ const WikiDetailPage = () => {
                 Paylaş
               </button>
             </div>
-            
-            {/* Meta bilgiler */}
-            {currentEntry.sourceKey && (
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <p className="text-[10px] font-bold text-sti uppercase mb-1">Kaynak Kodu</p>
-                <p className="text-xs font-mono text-slate-600 break-all">{currentEntry.sourceKey}</p>
-              </div>
-            )}
           </div>
         </div>
       </div>

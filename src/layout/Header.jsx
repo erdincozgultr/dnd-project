@@ -1,23 +1,16 @@
-// src/layout/Header.jsx - TAMAMEN YENİ
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Dices,
   ScrollText,
-  Swords,
   LogOut,
   User as UserIcon,
   Menu,
   X,
   Bell,
   Search,
-  Compass,
-  ShoppingBag,
-  Users,
   ChevronDown,
-  Gavel,
-  MapPinned,
   Settings,
   Shield,
 } from "lucide-react";
@@ -93,37 +86,24 @@ const Header = () => {
   const navItems = [
     {
       title: "Nasıl Oynanır",
-      icon: <Compass size={18} />,
       href: "/nasil-oynanir",
     },
-    { title: "Wiki", icon: <ScrollText size={18} />, href: "/wiki" },
-    { title: "Parti Bul", icon: <Swords size={18} />, href: "/parti-bul" },
+    { title: "Wiki", href: "/wiki" },
+    { title: "Parti Bul", href: "/parti-bul" },
     {
       title: "Taverna",
-      icon: <Users size={18} />,
       href: "/taverna",
       submenu: [
-        { title: "🏆 Sıralama", href: "/taverna/siralama" },
-        { title: "⚔️ Loncalar", href: "/taverna/loncalar" },
-        { title: "🎖️ Rozetler", href: "/taverna/rozetler" },
-      ],
-    },
-    {
-      title: "Araçlar",
-      icon: <Gavel size={18} />,
-      href: "/araclar",
-      submenu: [
-        { title: "Zar Kulesi", href: "/araclar/zar" },
-        { title: "İnisiyatif Takibi", href: "/araclar/inisiyatif" },
-        { title: "İsim Üretici", href: "/araclar/isim-uretici" },
+        { title: "Sıralama", href: "/taverna/siralama" },
+        { title: "Loncalar", href: "/taverna/loncalar" },
+        { title: "Rozetler", href: "/taverna/rozetler" },
       ],
     },
     {
       title: "Dost Mekanlar",
-      icon: <MapPinned size={18} />,
       href: "/mekanlar",
     },
-    { title: "Bit Pazarı", icon: <ShoppingBag size={18} />, href: "/pazar" },
+    { title: "Bit Pazarı", href: "/pazar" },
   ];
 
   return (
@@ -156,9 +136,6 @@ const Header = () => {
                   ${isActive ? "text-cta" : "text-sti hover:text-cta"}
                 `}
               >
-                <span className="text-cta/70 group-hover:text-cta">
-                  {item.icon}
-                </span>
                 {item.title}
                 {item.submenu && (
                   <ChevronDown

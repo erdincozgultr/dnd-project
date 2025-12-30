@@ -86,7 +86,7 @@ const LeaderboardSection = () => {
         }}
       />
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/55 to-mtf" />
       {/* Top Gradient Line */}
       {/* <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cta to-transparent" /> */}
 

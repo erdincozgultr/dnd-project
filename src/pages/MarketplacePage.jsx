@@ -106,12 +106,12 @@ const MarketplacePage = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-16 overflow-hidden sm:h-[600px] sm:flex sm:items-center">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/2d/3c/4e/2d3c4e5f6a7b8c9d0e1f2a3b4c5d6e7f.jpg')` }}
+          style={{ backgroundImage: `url('https://cdna.artstation.com/p/assets/images/images/020/107/772/large/samantha-kung-medieval-marketplace.jpg?1566397964')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-900/90 via-amber-900/80 to-mbg" />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-900/50 via-amber-900/55 to-mtf" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl">

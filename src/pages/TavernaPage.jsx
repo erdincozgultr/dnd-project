@@ -49,12 +49,12 @@ const TavernaPage = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-20 overflow-hidden sm:h-[600px] sm:flex sm:items-center">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center "
           style={{ backgroundImage: `url('https://i.pinimg.com/736x/77/a0/66/77a066581f52577684ebf61a2c7327f2.jpg')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-mbg" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-mtf" />
         
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cta/20 border border-cta/30 text-cta text-sm font-bold uppercase tracking-wider mb-6">

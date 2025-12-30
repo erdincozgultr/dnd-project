@@ -130,14 +130,14 @@ const BadgesPage = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-16 overflow-hidden sm:h-[600px] sm:flex sm:items-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://i.pinimg.com/736x/f5/9a/8b/f59a8b7c8d9e0a1b2c3d4e5f6a7b8c9d.jpg')`,
+            backgroundImage: `url('/banner/badge.png')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-yellow-900/90 via-yellow-900/80 to-mbg" />
+        <div className="absolute inset-0 bg-gradient-to-b from-yellow-900/50 via-yellow-900/55 to-mtf" />
 
         <div className="container mx-auto px-4 relative z-10">
           <Link

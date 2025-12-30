@@ -1,239 +1,218 @@
-// src/components/wiki/categories/BackgroundDetail.jsx
-
-import React, { useState } from 'react';
-import { 
-  Scroll, Wrench, Languages, Briefcase, BookOpen,
-  ChevronDown, ChevronUp, Sparkles, Users, Heart,
-  Target, AlertCircle, Link2
-} from 'lucide-react';
-import { getSourceDisplay } from '../../../constants/wikiConstants';
-import MarkdownRenderer from '../../common/MarkdownRenderer';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import React, { useState } from "react";
+import {
+  Scroll,
+  Star,
+  Package,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
 /**
  * Background (Geçmiş) detay componenti
- * metadata ve turkishContent'i parse ederek gösterir
+ *
+ * turkish_content yapısı:
+ * {
+ *   "name": "Eski Maceracı",
+ *   "desc": "...",
+ *   "skill_proficiencies": "Algı, Hayatta Kalma",
+ *   "tool_proficiencies": "Ek Alet Yetkinlikleri Yok",
+ *   "languages": "Seçtiğin bir dil",
+ *   "equipment": "...",
+ *   "feature_name": "Eski Arkadaşlar ve Düşmanlar",
+ *   "feature_desc": "...",
+ *   "additional_features": {
+ *     "suggested-characteristics": "..."
+ *   }
+ * }
  */
-const BackgroundDetail = ({ metadata, turkishContent }) => {
-  const [expandedSection, setExpandedSection] = useState(null);
-  
-  const tr = turkishContent || {};
-  const meta = metadata || {};
-  const source = getSourceDisplay(metadata);
 
-  // Benefits array'den veri çek (metadata formatı)
-  const getBenefit = (type) => {
-    if (!meta.benefits) return null;
-    return meta.benefits.find(b => b.type === type);
+const BackgroundDetail = ({ data }) => {
+  const [showCharacteristics, setShowCharacteristics] = useState(false);
+
+  if (!data) {
+    return <div className="text-center py-8 text-sti">Veri bulunamadı</div>;
+  }
+
+  // Markdown tabloları ve formatı HTML'e çevir
+  const formatContent = (text) => {
+    if (!text) return "";
+
+    return (
+      text
+        // Headers
+        .replace(
+          /### (.+)/g,
+          '<h3 class="text-base font-bold text-mtf mt-4 mb-2">$1</h3>'
+        )
+        .replace(
+          /## (.+)/g,
+          '<h2 class="text-lg font-bold text-mtf mt-4 mb-2">$1</h2>'
+        )
+        // Bold
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        // Tablolar - basit parse
+        .replace(/\| d\d+ \| .+ \|[\s\S]*?(?=\n\n|\n[^|]|$)/g, (match) => {
+          return formatTable(match);
+        })
+        // Line breaks
+        .replace(/\n\n/g, '</p><p class="mt-3">')
+        .replace(/\n/g, "<br/>")
+    );
   };
 
-  // Skill proficiencies
-  const getSkillProficiencies = () => {
-    return tr.skill_proficiencies || getBenefit('skill_proficiency')?.desc || null;
-  };
+  // Markdown tabloyu HTML'e çevir
+  const formatTable = (tableText) => {
+    const lines = tableText
+      .trim()
+      .split("\n")
+      .filter((l) => l.trim());
+    if (lines.length < 2) return tableText;
 
-  // Tool proficiencies
-  const getToolProficiencies = () => {
-    return tr.tool_proficiencies || getBenefit('tool_proficiency')?.desc || null;
-  };
+    let html = '<table class="w-full border-collapse text-sm my-4">';
 
-  // Languages
-  const getLanguages = () => {
-    return tr.languages || getBenefit('language')?.desc || null;
-  };
+    lines.forEach((line, index) => {
+      // Separator satırını atla
+      if (line.match(/^\|[-:\s|]+\|$/)) return;
 
-  // Equipment
-  const getEquipment = () => {
-    return tr.equipment || getBenefit('equipment')?.desc || null;
-  };
+      const cells = line.split("|").filter((c) => c.trim());
+      const tag = index === 0 ? "th" : "td";
 
-  // Feature
-  const getFeature = () => {
-    const benefit = getBenefit('feature');
-    return {
-      name: tr.feature_name || benefit?.name || 'Özellik',
-      desc: tr.feature_desc || benefit?.desc || null
-    };
-  };
+      if (index === 0) html += "<thead>";
+      if (index === 1 || (index === 2 && lines[1].includes("---")))
+        html += "<tbody>";
 
-  // Suggested Characteristics - Markdown olarak render edilecek
-  const getCharacteristics = () => {
-    return tr.additional_features?.['suggested-characteristics'] || 
-           getBenefit('suggested_characteristics')?.desc || null;
-  };
+      html += "<tr>";
+      cells.forEach((cell) => {
+        const cellClass =
+          index === 0
+            ? "bg-emerald-50 p-2 text-left font-bold border border-emerald-200 text-emerald-700"
+            : "p-2 border border-slate-200";
+        html += `<${tag} class="${cellClass}">${cell.trim()}</${tag}>`;
+      });
+      html += "</tr>";
 
-  // Connection and Memento - Markdown olarak render edilecek
-  const getConnectionMemento = () => {
-    return tr.additional_features?.['connection-and-memento'] ||
-           getBenefit('connection_and_memento')?.desc || null;
-  };
+      if (index === 0) html += "</thead>";
+    });
 
-  // Adventures and Advancement
-  const getAdvancement = () => {
-    return tr.additional_features?.['adventures-and-advancement'] ||
-           getBenefit('adventures_and_advancement')?.desc || null;
-  };
-
-  // Ability Score Increase
-  const getASI = () => {
-    return tr.ability_score_increase || getBenefit('ability_score')?.desc || null;
-  };
-
-  const feature = getFeature();
-  const characteristics = getCharacteristics();
-  const connectionMemento = getConnectionMemento();
-
-  // Section toggle
-  const toggleSection = (section) => {
-    setExpandedSection(expandedSection === section ? null : section);
+    html += "</tbody></table>";
+    return html;
   };
 
   return (
     <div className="space-y-6">
-      {/* Açıklama - Markdown destekli */}
-      {(tr.desc || meta.desc) && (
-        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-2xl p-6">
-          <MarkdownRenderer 
-            content={tr.desc || meta.desc} 
-            variant="card"
-          />
+      {/* Ana Bilgi Kartı */}
+      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-2xl p-6">
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 bg-white border-2 border-emerald-300 rounded-xl flex items-center justify-center shadow-sm">
+            <Scroll size={32} className="text-emerald-600" />
+          </div>
+
+          <div className="flex-1 space-y-2">
+            {/* Beceri Yetkinlikleri */}
+            {data.skill_proficiencies && (
+              <div className="bg-white/80 rounded-lg px-4 py-2 inline-block">
+                <p className="text-[10px] text-sti uppercase">
+                  Beceri Yetkinlikleri
+                </p>
+                <p className="font-bold text-emerald-700 text-sm">
+                  {data.skill_proficiencies}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* Proficiency'ler Grid */}
+      {/* Yetkinlikler Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Beceri Yetkinlikleri */}
-        {getSkillProficiencies() && (
-          <div className="bg-white border border-cbg rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Target size={18} className="text-blue-500" />
-              <span className="text-sm font-bold text-mtf">Beceri Yetkinlikleri</span>
+        {data.tool_proficiencies &&
+          data.tool_proficiencies !== "Ek Alet Yetkinlikleri Yok" && (
+            <div className="bg-white border border-cbg rounded-xl p-4">
+              <p className="text-[10px] font-bold text-sti uppercase mb-1">
+                Araç Yetkinlikleri
+              </p>
+              <p className="text-sm text-mtf">{data.tool_proficiencies}</p>
             </div>
-            <p className="text-sm text-sti">{getSkillProficiencies()}</p>
-          </div>
-        )}
+          )}
 
-        {/* Araç Yetkinlikleri */}
-        {getToolProficiencies() && getToolProficiencies() !== 'Ek Alet Yetkinlikleri Yok' && (
+        {data.languages && (
           <div className="bg-white border border-cbg rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Wrench size={18} className="text-amber-500" />
-              <span className="text-sm font-bold text-mtf">Araç Yetkinlikleri</span>
-            </div>
-            <p className="text-sm text-sti">{getToolProficiencies()}</p>
-          </div>
-        )}
-
-        {/* Diller */}
-        {getLanguages() && (
-          <div className="bg-white border border-cbg rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Languages size={18} className="text-purple-500" />
-              <span className="text-sm font-bold text-mtf">Diller</span>
-            </div>
-            <p className="text-sm text-sti">{getLanguages()}</p>
-          </div>
-        )}
-
-        {/* Yetenek Puanı Artışı */}
-        {getASI() && (
-          <div className="bg-white border border-cbg rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={18} className="text-indigo-500" />
-              <span className="text-sm font-bold text-mtf">Yetenek Artışı</span>
-            </div>
-            <p className="text-sm text-sti">{getASI()}</p>
+            <p className="text-[10px] font-bold text-sti uppercase mb-1">
+              Diller
+            </p>
+            <p className="text-sm text-mtf">{data.languages}</p>
           </div>
         )}
       </div>
 
       {/* Ekipman */}
-      {getEquipment() && (
+      {data.equipment && (
         <div className="bg-white border border-cbg rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Briefcase size={18} className="text-slate-500" />
+            <Package size={16} className="text-amber-500" />
             <span className="text-sm font-bold text-mtf">Ekipman</span>
           </div>
-          <p className="text-sm text-sti leading-relaxed">{getEquipment()}</p>
+          <p className="text-sm text-sti leading-relaxed">{data.equipment}</p>
         </div>
       )}
 
-      {/* Özellik (Feature) */}
-      {feature.desc && (
+      {/* Özellik */}
+      {(data.feature_name || data.feature_desc) && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Scroll size={18} className="text-emerald-600" />
-            <span className="text-sm font-bold text-emerald-700">{feature.name}</span>
+          <div className="flex items-center gap-2 mb-2">
+            <Star size={16} className="text-emerald-500" />
+            <span className="text-sm font-bold text-emerald-700">
+              {data.feature_name || "Özellik"}
+            </span>
           </div>
-          <MarkdownRenderer content={feature.desc} variant="card" />
+          <p className="text-sm text-emerald-800 leading-relaxed">
+            {" "}
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {data.feature_desc}
+            </ReactMarkdown>
+          </p>
         </div>
       )}
 
-      {/* Macera ve İlerleme */}
-      {getAdvancement() && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+      {/* Açıklama */}
+      {data.desc && (
+        <div className="bg-white border border-cbg rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles size={18} className="text-amber-600" />
-            <span className="text-sm font-bold text-amber-700">Maceralar ve İlerleme</span>
+            <BookOpen size={16} className="text-slate-500" />
+            <span className="text-sm font-bold text-mtf">Açıklama</span>
           </div>
-          <MarkdownRenderer content={getAdvancement()} variant="compact" />
-        </div>
-      )}
-
-      {/* Bağlantılar ve Yadigârlar */}
-      {connectionMemento && (
-        <div className="border border-cbg rounded-xl overflow-hidden">
-          <button
-            onClick={() => toggleSection('connections')}
-            className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Link2 size={18} className="text-slate-500" />
-              <span className="font-bold text-mtf">Bağlantılar & Yadigârlar</span>
-            </div>
-            {expandedSection === 'connections' 
-              ? <ChevronUp size={18} className="text-slate-500" />
-              : <ChevronDown size={18} className="text-slate-500" />
-            }
-          </button>
-          
-          {expandedSection === 'connections' && (
-            <div className="p-4 bg-white">
-              <MarkdownRenderer content={connectionMemento} variant="compact" />
-            </div>
-          )}
+          <div className="prose prose-sm max-w-none text-sti leading-relaxed" />
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.desc}</ReactMarkdown>
         </div>
       )}
 
       {/* Önerilen Karakteristikler */}
-      {characteristics && (
+      {data.additional_features?.["suggested-characteristics"] && (
         <div className="border border-cbg rounded-xl overflow-hidden">
           <button
-            onClick={() => toggleSection('characteristics')}
-            className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors"
+            onClick={() => setShowCharacteristics(!showCharacteristics)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
           >
-            <div className="flex items-center gap-2">
-              <Users size={18} className="text-purple-500" />
-              <span className="font-bold text-purple-700">Önerilen Karakteristikler</span>
-            </div>
-            {expandedSection === 'characteristics' 
-              ? <ChevronUp size={18} className="text-purple-500" />
-              : <ChevronDown size={18} className="text-purple-500" />
-            }
+            <span className="font-bold text-mtf text-sm">
+              Önerilen Karakteristikler
+            </span>
+            {showCharacteristics ? (
+              <ChevronUp size={16} className="text-sti" />
+            ) : (
+              <ChevronDown size={16} className="text-sti" />
+            )}
           </button>
-          
-          {expandedSection === 'characteristics' && (
-            <div className="p-4 bg-white">
-              <MarkdownRenderer content={characteristics} variant="default" />
+          {showCharacteristics && (
+            <div className="p-4 max-h-[500px] overflow-y-auto">
+              <div className="prose prose-sm max-w-none text-sti leading-relaxed" />
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {data.additional_features["suggested-characteristics"]}
+              </ReactMarkdown>
             </div>
           )}
-        </div>
-      )}
-
-      {/* Kaynak */}
-      {source && (
-        <div className="flex items-center gap-2 text-xs text-sti">
-          <BookOpen size={14} />
-          <span>Kaynak: {source}</span>
         </div>
       )}
     </div>

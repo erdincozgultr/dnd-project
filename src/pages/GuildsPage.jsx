@@ -83,14 +83,14 @@ const GuildsPage = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-16 overflow-hidden sm:h-[600px] sm:flex sm:items-center">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://i.pinimg.com/736x/8a/7e/9a/8a7e9a5b7c8e9d0a1b2c3d4e5f6a7b8c.jpg')`,
+            backgroundImage: `url('/banner/guild.png')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/90 via-purple-900/80 to-mbg" />
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/50 via-purple-900/55 to-mtf" />
 
         <div className="container mx-auto px-4 relative z-10">
           <Link

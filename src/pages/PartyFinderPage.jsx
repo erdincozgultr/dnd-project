@@ -129,7 +129,7 @@ const PartyFinderPage = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('https://cdnb.artstation.com/p/assets/images/images/031/312/947/large/alysha-lowery-table2.jpg?1603252402')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-mtf" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">

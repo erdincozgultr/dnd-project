@@ -140,12 +140,12 @@ const VenuesPage = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-16 overflow-hidden sm:h-[600px] sm:flex sm:items-center">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/a8/b2/c4/a8b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7.jpg')` }}
+          style={{ backgroundImage: `url('https://i.pinimg.com/1200x/fe/67/38/fe6738534d19543c643e123d0351dac5.jpg')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/90 via-emerald-900/80 to-mbg" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/50 via-emerald-900/55 to-mtf" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl">
