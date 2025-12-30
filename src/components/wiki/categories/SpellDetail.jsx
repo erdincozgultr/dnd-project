@@ -12,6 +12,25 @@ import {
   BookOpen,
 } from "lucide-react";
 
+/**
+ * Büyü detay componenti
+ * 
+ * turkish_content yapısı:
+ * {
+ *   "name": "Resurrection",
+ *   "desc": "...",
+ *   "level": 7,
+ *   "range": "Dokunma",
+ *   "ritual": false,
+ *   "school": "Nekromansi (Necromancy)",
+ *   "duration": "Anlık",
+ *   "components": "V, S, M",
+ *   "casting_time": "1hour",
+ *   "higher_level": "",
+ *   "available_for": "Ruhban, Druid, Büyücü"
+ * }
+ */
+
 // Büyü okulu renkleri
 const SCHOOL_THEMES = {
   koruma: {

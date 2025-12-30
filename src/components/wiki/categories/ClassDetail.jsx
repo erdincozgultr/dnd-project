@@ -6,6 +6,32 @@ import {
   ChevronDown, ChevronUp, Sparkles, Scroll
 } from 'lucide-react';
 
+/**
+ * Sınıf detay componenti
+ * 
+ * turkish_content yapısı:
+ * {
+ *   "name": "Keşiş (Monk)",
+ *   "desc": "### Zırhsız Savunma...",
+ *   "hit_dice": "1d8",
+ *   "hp_at_1st_level": "8 + Dayanıklılık düzenleyicin",
+ *   "hp_at_higher_levels": "1d8 (veya 5) + Dayanıklılık düzenleyicin",
+ *   "spellcasting_ability": "",
+ *   "equipment": "...",
+ *   "table": "| Seviye | Ustalık Bonusu | ...",
+ *   "proficiencies": {
+ *     "armor": "Yok",
+ *     "weapons": "Basit silahlar, kısa kılıçlar",
+ *     "tools": "...",
+ *     "skills": "...",
+ *     "saving_throws": "Güç, Çeviklik"
+ *   },
+ *   "archetypes": [
+ *     { "name": "...", "desc": "...", "slug": "..." }
+ *   ]
+ * }
+ */
+
 const ClassDetail = ({ data }) => {
   const [showTable, setShowTable] = useState(false);
   const [showDesc, setShowDesc] = useState(false);
