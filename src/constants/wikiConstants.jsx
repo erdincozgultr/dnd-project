@@ -2,7 +2,7 @@
 
 import { 
   Shield, Sword, Sparkles, Skull, Gem, Zap, 
-  Scroll, Users, AlertCircle, Globe 
+  Scroll, Users, AlertCircle, Globe, GraduationCap, BookMarked
 } from 'lucide-react';
 
 /**
@@ -18,7 +18,9 @@ export const WIKI_CATEGORIES = {
   BACKGROUND: 'BACKGROUND',
   RACES: 'RACES',
   CONDITIONS: 'CONDITIONS',
-  PLANES: 'PLANES'
+  PLANES: 'PLANES',
+  CLASSES: 'CLASSES',
+  SPELL_LIST: 'SPELL_LIST'
 };
 
 /**
@@ -98,6 +100,20 @@ export const CATEGORY_CONFIG = {
     color: 'cyan',
     defaultImage: '/wiki/planes.png',
     bgGradient: 'from-cyan-500 to-cyan-700'
+  },
+  [WIKI_CATEGORIES.CLASSES]: {
+    label: 'Sınıflar',
+    icon: GraduationCap,
+    color: 'indigo',
+    defaultImage: '/wiki/classes.png',
+    bgGradient: 'from-indigo-500 to-indigo-700'
+  },
+  [WIKI_CATEGORIES.SPELL_LIST]: {
+    label: 'Büyü Listeleri',
+    icon: BookMarked,
+    color: 'violet',
+    defaultImage: '/wiki/spell_lists.png',
+    bgGradient: 'from-violet-500 to-violet-700'
   }
 };
 

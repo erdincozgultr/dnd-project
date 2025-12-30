@@ -8,9 +8,10 @@ import PlaneDetail from './PlaneDetail';
 import FeatDetail from './FeatDetail';
 import MagicItemDetail from './MagicItemDetail';
 import ConditionDetail from './ConditionDetail';
-// Kalan kategoriler
-// import SpellDetail from './SpellDetail';
-// import MonsterDetail from './MonsterDetail';
+import ClassDetail from './ClassDetail';
+import SpellListDetail from './SpellListDetail';
+import MonsterDetail from './MonsterDetail';
+import SpellDetail from './SpellDetail';
 
 import { WIKI_CATEGORIES } from '../../../constants/wikiConstants';
 
@@ -27,8 +28,10 @@ const CATEGORY_COMPONENTS = {
   [WIKI_CATEGORIES.FEATS]: FeatDetail,
   [WIKI_CATEGORIES.MAGIC_ITEM]: MagicItemDetail,
   [WIKI_CATEGORIES.CONDITIONS]: ConditionDetail,
-  // [WIKI_CATEGORIES.SPELLS]: SpellDetail,
-  // [WIKI_CATEGORIES.MONSTERS]: MonsterDetail,
+  [WIKI_CATEGORIES.CLASSES]: ClassDetail,
+  [WIKI_CATEGORIES.SPELL_LIST]: SpellListDetail,
+  [WIKI_CATEGORIES.MONSTERS]: MonsterDetail,
+  [WIKI_CATEGORIES.SPELLS]: SpellDetail,
 };
 
 /**
@@ -85,5 +88,9 @@ export {
   FeatDetail,
   MagicItemDetail,
   ConditionDetail,
+  ClassDetail,
+  SpellListDetail,
+  MonsterDetail,
+  SpellDetail,
   DefaultDetail
 };
