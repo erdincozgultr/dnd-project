@@ -66,7 +66,7 @@ const PageContent = () => {
       <Route path="/pazar/duzenle/:id" element={<CreateListingPage />} />
       <Route path="/marketplace" element={<Navigate to="/pazar" replace />} />
 
-      {/* Profile & Settings */}
+      {/* Profil & Ayarlar */}
       <Route path="/profil/:username" element={<ProfilePage />} />
       <Route path="/profile/:username" element={<Navigate to="/profil/:username" replace />} />
       <Route path="/ayarlar" element={<SettingsPage />} />
