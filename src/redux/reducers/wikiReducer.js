@@ -1,5 +1,7 @@
+// src/redux/reducers/wikiReducer.js
+
 import { WIKI_ACTIONS } from '../actions/wikiActions';
-import { WIKI_PAGINATION } from '../../constants/wikiConstants.jsx';
+import { WIKI_PAGINATION, EXCLUDED_CATEGORIES } from '../../constants/wikiConstants.jsx';
 
 const initialState = {
   // Liste
@@ -16,6 +18,7 @@ const initialState = {
   searchQuery: '',
   sortBy: WIKI_PAGINATION.DEFAULT_SORT,
   sortDir: WIKI_PAGINATION.DEFAULT_SORT_DIR,
+  contentType: 'official', // 'official' | 'homebrew'
   
   // Detay
   currentEntry: null,
@@ -28,6 +31,14 @@ const initialState = {
   detailLoading: false,
   error: null,
   detailError: null
+};
+
+/**
+ * SECTIONS ve DOCUMENTS kategorilerini filtrele
+ */
+const filterValidEntries = (entries) => {
+  if (!entries || !Array.isArray(entries)) return [];
+  return entries.filter(entry => !EXCLUDED_CATEGORIES.includes(entry.category));
 };
 
 const wikiReducer = (state = initialState, action) => {
@@ -44,7 +55,7 @@ const wikiReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        entries: action.payload.entries,
+        entries: filterValidEntries(action.payload.entries), // Filtreleme burada!
         pagination: action.payload.pagination,
         error: null
       };
@@ -66,6 +77,16 @@ const wikiReducer = (state = initialState, action) => {
       };
       
     case WIKI_ACTIONS.FETCH_DETAIL_SUCCESS:
+      // SECTIONS ve DOCUMENTS detay sayfası açılırsa hata göster
+      if (EXCLUDED_CATEGORIES.includes(action.payload?.category)) {
+        return {
+          ...state,
+          detailLoading: false,
+          detailError: 'Bu içerik kategorisi gösterilemiyor',
+          currentEntry: null
+        };
+      }
+      
       return {
         ...state,
         detailLoading: false,
@@ -117,6 +138,19 @@ const wikiReducer = (state = initialState, action) => {
         sortDir: action.payload.sortDir
       };
       
+    case WIKI_ACTIONS.SET_CONTENT_TYPE:
+      return {
+        ...state,
+        contentType: action.payload,
+        // Content type değişince filtreleri sıfırla
+        activeCategory: null,
+        searchQuery: '',
+        pagination: {
+          ...state.pagination,
+          page: 0
+        }
+      };
+      
     case WIKI_ACTIONS.RESET_FILTERS:
       return {
         ...state,
@@ -132,9 +166,17 @@ const wikiReducer = (state = initialState, action) => {
     
     // ========== STATS ==========
     case WIKI_ACTIONS.FETCH_STATS_SUCCESS:
+      // Kategori sayılarından da SECTIONS ve DOCUMENTS'ı çıkar
+      const filteredCounts = {};
+      Object.entries(action.payload).forEach(([category, count]) => {
+        if (!EXCLUDED_CATEGORIES.includes(category)) {
+          filteredCounts[category] = count;
+        }
+      });
+      
       return {
         ...state,
-        categoryCounts: action.payload
+        categoryCounts: filteredCounts
       };
       
     default:

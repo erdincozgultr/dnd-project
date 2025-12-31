@@ -21,6 +21,7 @@ export const WIKI_ACTIONS = {
   SET_SEARCH: 'wiki/SET_SEARCH',
   SET_PAGE: 'wiki/SET_PAGE',
   SET_SORT: 'wiki/SET_SORT',
+  SET_CONTENT_TYPE: 'wiki/SET_CONTENT_TYPE',
   RESET_FILTERS: 'wiki/RESET_FILTERS',
   
   // İstatistik
@@ -32,51 +33,78 @@ export const WIKI_ACTIONS = {
 // ============================================
 
 /**
- * Wiki listesi getir (pagination + filtre destekli)
+ * Content type değiştir (official | homebrew)
+ */
+export const setContentType = (contentType) => (dispatch) => {
+  dispatch({ type: WIKI_ACTIONS.SET_CONTENT_TYPE, payload: contentType });
+  dispatch({ type: WIKI_ACTIONS.SET_PAGE, payload: 0 });
+  dispatch(fetchWikiEntries());
+};
+
+/**
+ * Wiki/Homebrew listesi getir (pagination + filtre destekli)
  */
 export const fetchWikiEntries = () => async (dispatch, getState) => {
   const { wiki } = getState();
-  const { activeCategory, searchQuery, pagination, sortBy, sortDir } = wiki;
+  const { activeCategory, searchQuery, pagination, sortBy, sortDir, contentType } = wiki;
   
   dispatch({ type: WIKI_ACTIONS.FETCH_START });
   
   try {
+    let baseUrl;
     let url;
     const params = new URLSearchParams({
       page: pagination.page,
-      size: pagination.size,
-      sortBy: sortBy,
-      sortDir: sortDir
+      size: pagination.size
     });
+
+    // Sort parametreleri (sadece wiki için)
+    if (contentType === 'official') {
+      params.append('sortBy', sortBy);
+      params.append('sortDir', sortDir);
+    }
+    
+    // Base URL belirleme
+    baseUrl = contentType === 'homebrew' ? '/homebrews' : '/wiki';
     
     // URL belirleme
     if (searchQuery) {
       // Arama modu
       if (activeCategory) {
-        url = `${WIKI_API.CATEGORY_SEARCH(activeCategory)}?q=${encodeURIComponent(searchQuery)}&${params}`;
+        url = `${baseUrl}/category/${activeCategory}/search?q=${encodeURIComponent(searchQuery)}&${params}`;
       } else {
-        url = `${WIKI_API.SEARCH}?q=${encodeURIComponent(searchQuery)}&${params}`;
+        url = `${baseUrl}/search?q=${encodeURIComponent(searchQuery)}&${params}`;
       }
     } else if (activeCategory) {
       // Kategori modu
-      url = `${WIKI_API.CATEGORY(activeCategory)}?${params}`;
+      url = `${baseUrl}/category/${activeCategory}?${params}`;
     } else {
       // Tüm içerikler
-      url = `${WIKI_API.LIST}?${params}`;
+      url = `${baseUrl}?${params}`;
     }
     
     const response = await axiosClient.get(url);
     
+    // Response format kontrolü
+    const data = response.data;
+    const entries = data.content || data;
+    const paginationData = data.pageable ? {
+      page: data.number,
+      size: data.size,
+      totalPages: data.totalPages,
+      totalElements: data.totalElements
+    } : {
+      page: 0,
+      size: entries.length,
+      totalPages: 1,
+      totalElements: entries.length
+    };
+    
     dispatch({
       type: WIKI_ACTIONS.FETCH_SUCCESS,
       payload: {
-        entries: response.data.content,
-        pagination: {
-          page: response.data.number,
-          size: response.data.size,
-          totalPages: response.data.totalPages,
-          totalElements: response.data.totalElements
-        }
+        entries,
+        pagination: paginationData
       }
     });
   } catch (error) {
@@ -88,13 +116,14 @@ export const fetchWikiEntries = () => async (dispatch, getState) => {
 };
 
 /**
- * Wiki detay getir (slug ile)
+ * Wiki/Homebrew detay getir (slug ile)
  */
-export const fetchWikiDetail = (slug) => async (dispatch) => {
+export const fetchWikiDetail = (slug, isHomebrew = false) => async (dispatch) => {
   dispatch({ type: WIKI_ACTIONS.FETCH_DETAIL_START });
   
   try {
-    const response = await axiosClient.get(WIKI_API.DETAIL(slug));
+    const baseUrl = isHomebrew ? '/homebrews' : '/wiki';
+    const response = await axiosClient.get(`${baseUrl}/slug/${slug}`);
     
     dispatch({
       type: WIKI_ACTIONS.FETCH_DETAIL_SUCCESS,
@@ -111,9 +140,13 @@ export const fetchWikiDetail = (slug) => async (dispatch) => {
 /**
  * Kategori sayılarını getir
  */
-export const fetchCategoryStats = () => async (dispatch) => {
+export const fetchCategoryStats = () => async (dispatch, getState) => {
+  const { wiki } = getState();
+  const { contentType } = wiki;
+  
   try {
-    const response = await axiosClient.get(WIKI_API.STATS);
+    const baseUrl = contentType === 'homebrew' ? '/homebrews' : '/wiki';
+    const response = await axiosClient.get(`${baseUrl}/stats/counts`);
     
     dispatch({
       type: WIKI_ACTIONS.FETCH_STATS_SUCCESS,
@@ -121,44 +154,7 @@ export const fetchCategoryStats = () => async (dispatch) => {
     });
   } catch (error) {
     console.error('Stats fetch error:', error);
-  }
-};
-
-/**
- * Türkçe arama
- */
-export const searchTurkish = (query) => async (dispatch, getState) => {
-  const { wiki } = getState();
-  const { pagination } = wiki;
-  
-  dispatch({ type: WIKI_ACTIONS.FETCH_START });
-  
-  try {
-    const params = new URLSearchParams({
-      q: query,
-      page: pagination.page,
-      size: pagination.size
-    });
-    
-    const response = await axiosClient.get(`${WIKI_API.SEARCH_TURKISH}?${params}`);
-    
-    dispatch({
-      type: WIKI_ACTIONS.FETCH_SUCCESS,
-      payload: {
-        entries: response.data.content,
-        pagination: {
-          page: response.data.number,
-          size: response.data.size,
-          totalPages: response.data.totalPages,
-          totalElements: response.data.totalElements
-        }
-      }
-    });
-  } catch (error) {
-    dispatch({
-      type: WIKI_ACTIONS.FETCH_ERROR,
-      payload: error.response?.data?.message || 'Arama yapılırken hata oluştu'
-    });
+    // Stats hatası kritik değil, sessizce devam et
   }
 };
 

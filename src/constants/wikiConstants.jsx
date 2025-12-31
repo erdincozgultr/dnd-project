@@ -1,4 +1,4 @@
-// src/constants/wikiConstants
+// src/constants/wikiConstants.jsx
 
 import { 
   Shield, Sword, Sparkles, Skull, Gem, Zap, 
@@ -22,6 +22,12 @@ export const WIKI_CATEGORIES = {
   CLASSES: 'CLASSES',
   SPELL_LIST: 'SPELL_LIST'
 };
+
+/**
+ * Backend'den gelen ama gösterilmemesi gereken kategoriler
+ * SECTIONS ve DOCUMENTS farklı sayfa yapıları, wiki kategorisi değil
+ */
+export const EXCLUDED_CATEGORIES = ['SECTIONS', 'DOCUMENTS'];
 
 /**
  * Kategori konfigürasyonları
@@ -143,7 +149,22 @@ export const getCategoryDefaultImage = (category) => {
 };
 
 /**
- * Sidebar için kategori listesi
+ * Kategorinin geçerli (gösterilmesi gereken) olup olmadığını kontrol et
+ */
+export const isValidCategory = (category) => {
+  return !EXCLUDED_CATEGORIES.includes(category);
+};
+
+/**
+ * Wiki entry için resim URL'i döndür (default image fallback ile)
+ */
+export const getEntryImageUrl = (entry) => {
+  if (entry?.imageUrl) return entry.imageUrl;
+  return getCategoryDefaultImage(entry?.category);
+};
+
+/**
+ * Sidebar için kategori listesi (filtrelenmiş)
  */
 export const CATEGORY_LIST = Object.entries(CATEGORY_CONFIG).map(([key, config]) => ({
   id: key,

@@ -141,6 +141,32 @@ export const HOMEBREW_TEMPLATES = {
   }
 };
 
+/**
+ * Kategori default image mapping (Wiki kategorileriyle uyumlu)
+ */
+export const HOMEBREW_DEFAULT_IMAGES = {
+  SPELL: '/wiki/spells.png',
+  MONSTER: '/wiki/monsters.png',
+  RACE: '/wiki/races.png',
+  CLASS: '/wiki/classes.png',
+  BACKGROUND: '/wiki/background.png',
+  FEAT: '/wiki/feats.png',
+  MAGIC_ITEM: '/wiki/magic_items.png',
+  WEAPON: '/wiki/weapons.png',
+  ARMOR: '/wiki/armors.png',
+  CONDITION: '/wiki/conditions.png',
+  PLANE: '/wiki/planes.png',
+  CUSTOM: '/wiki/spells.png' // fallback
+};
+
+/**
+ * Homebrew entry için resim URL'i döndür (default image fallback ile)
+ */
+export const getHomebrewImageUrl = (entry) => {
+  if (entry?.imageUrl) return entry.imageUrl;
+  return HOMEBREW_DEFAULT_IMAGES[entry?.category] || HOMEBREW_DEFAULT_IMAGES.CUSTOM;
+};
+
 export const CATEGORY_LABELS = {
   SPELL: "Büyüler",
   MONSTER: "Canavarlar",
