@@ -89,6 +89,7 @@ const Header = () => {
       href: "/nasil-oynanir",
     },
     { title: "Wiki", href: "/wiki" },
+    { title: "Blog", href: "/blog"},
     { title: "Parti Bul", href: "/parti-bul" },
     {
       title: "Taverna",

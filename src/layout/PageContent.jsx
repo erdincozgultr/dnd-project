@@ -1,3 +1,4 @@
+// src/layout/PageContent.jsx - BLOG ROUTES EKLENDİ
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import SettingsPage from "../pages/SettingsPage";
@@ -23,13 +24,26 @@ import CreateListingPage from "../pages/CreateListingPage";
 import VenuesPage from "../pages/VenuesPage";
 import VenueDetailPage from "../pages/VenueDetailPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
-import NotificationsPage from "../pages/NotificationsPage"
+import NotificationsPage from "../pages/NotificationsPage";
+
+// Blog pages - YENİ ✨
+import BlogPage from "../pages/blog/BlogPage";
+import BlogDetailPage from "../pages/blog/BlogDetailPage";
+import CreateBlogPage from "../pages/blog/CreateBlogPage";
+import MyBlogsPage from "../pages/blog/MyBlogsPage";
 
 const PageContent = () => {
   return (
     <Routes>
       {/* Ana Sayfa */}
       <Route path="/" element={<HomePage />} />
+      
+      {/* Blog - YENİ ✨ */}
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<BlogDetailPage />} />
+      <Route path="/blog/yaz" element={<CreateBlogPage />} />
+      <Route path="/blog/duzenle/:id" element={<CreateBlogPage />} />
+      <Route path="/blog/bloglarim" element={<MyBlogsPage />} />
       
       {/* Wiki & Homebrew */}
       <Route path="/wiki" element={<WikiPage />} />
@@ -38,11 +52,10 @@ const PageContent = () => {
       <Route path="/create-homebrew" element={<CreateHomebrewPage />} />
       <Route path="/collections/me" element={<MyCollectionsPage />} />
 
-      {/* Dost Mekanlar - YENİ URL YAPISI */}
+      {/* Dost Mekanlar */}
       <Route path="/mekanlar" element={<VenuesPage />} />
       <Route path="/mekanlar/:id" element={<VenueDetailPage />} />
       <Route path="/mekanlar/ekle" element={<CreateVenuePage />} />
-      {/* Eski URL'ler için redirect */}
       <Route path="/venues" element={<Navigate to="/mekanlar" replace />} />
       <Route path="/venues/:id" element={<Navigate to="/mekanlar/:id" replace />} />
       <Route path="/venues/new" element={<Navigate to="/mekanlar/ekle" replace />} />
@@ -55,11 +68,10 @@ const PageContent = () => {
       <Route path="/taverna/lonca-olustur" element={<CreateGuildPage />} />
       <Route path="/taverna/lonca-duzenle/:id" element={<CreateGuildPage />} />
       <Route path="/taverna/rozetler" element={<BadgesPage />} />
-      {/* Eski URL redirects */}
       <Route path="/guilds" element={<Navigate to="/taverna/loncalar" replace />} />
       <Route path="/guilds/:id" element={<Navigate to="/taverna/loncalar/:id" replace />} />
 
-      {/* Bit Pazarı (Marketplace) */}
+      {/* Bit Pazarı */}
       <Route path="/pazar" element={<MarketplacePage />} />
       <Route path="/pazar/:id" element={<ListingDetailPage />} />
       <Route path="/pazar/ilan-olustur" element={<CreateListingPage />} />
@@ -78,7 +90,7 @@ const PageContent = () => {
       <Route path="/kampanya-duzenle/:id" element={<CreateCampaignPage />} />
       <Route path="/create-campaign" element={<Navigate to="/kampanya-olustur" replace />} />
 
-           {/* Notifications */}
+      {/* Notifications */}
       <Route path="/bildirimler" element={<NotificationsPage />} />
       <Route path="/notifications" element={<Navigate to="/bildirimler" replace />} />
 
@@ -88,7 +100,7 @@ const PageContent = () => {
       <Route path="/kayit" element={<RegisterPage />} />
       <Route path="/register" element={<Navigate to="/kayit" replace />} />
 
-      {/* 404 - Anasayfaya yönlendir */}
+      {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
