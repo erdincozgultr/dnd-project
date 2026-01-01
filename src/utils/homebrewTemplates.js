@@ -2,11 +2,12 @@
 
 /**
  * Homebrew kategori şablonları
- * Backend enum'ları: SPELL, MONSTER, RACE, CLASS, BACKGROUND, FEAT, MAGIC_ITEM, WEAPON, ARMOR, CONDITION, PLANE, CUSTOM
+ * Backend enum'ları artık Wiki ile aynı:
+ * BACKGROUND, SPELLS, MAGIC_ITEM, FEATS, MONSTERS, PLANES, WEAPON, RACES, CONDITIONS, ARMOR, CLASSES, CUSTOM
  */
 
 export const HOMEBREW_TEMPLATES = {
-  SPELL: {
+  SPELLS: {  // ✅ SPELL → SPELLS
     level: 0,
     school: "",
     casting_time: "1 eylem",
@@ -18,7 +19,7 @@ export const HOMEBREW_TEMPLATES = {
     available_for: ""
   },
 
-  MONSTER: {
+  MONSTERS: {  // ✅ MONSTER → MONSTERS
     size: "Orta",
     type: "insansı",
     alignment: "tarafsız",
@@ -41,7 +42,7 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  RACE: {
+  RACES: {  // ✅ RACE → RACES
     type: "",
     alignment: "",
     age: "",
@@ -54,7 +55,7 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  CLASS: {
+  CLASSES: {  // ✅ CLASS → CLASSES
     hit_die: "d8",
     primary_ability: "",
     saving_throws: "",
@@ -72,7 +73,7 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  BACKGROUND: {
+  BACKGROUND: {  // ✅ Aynı kaldı
     skill_proficiencies: "",
     tool_proficiencies: "",
     languages: "",
@@ -85,13 +86,13 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  FEAT: {
+  FEATS: {  // ✅ FEAT → FEATS
     prerequisite: "",
     benefits: [],
     desc: ""
   },
 
-  MAGIC_ITEM: {
+  MAGIC_ITEM: {  // ✅ Aynı kaldı
     type: "Harika Eşya",
     rarity: "Sıradan",
     attunement: false,
@@ -100,7 +101,7 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  WEAPON: {
+  WEAPON: {  // ✅ Aynı kaldı
     category: "Basit Yakın Dövüş",
     damage: {
       dice: "1d6",
@@ -113,7 +114,7 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  ARMOR: {
+  ARMOR: {  // ✅ Aynı kaldı
     type: "Hafif Zırh",
     armor_class: "11",
     strength_requirement: "",
@@ -123,12 +124,12 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  CONDITION: {
+  CONDITIONS: {  // ✅ CONDITION → CONDITIONS
     effects: [],
     desc: ""
   },
 
-  PLANE: {
+  PLANES: {  // ✅ PLANE → PLANES
     type: "",
     alignment: "",
     inhabitants: "",
@@ -136,82 +137,84 @@ export const HOMEBREW_TEMPLATES = {
     desc: ""
   },
 
-  CUSTOM: {
+  CUSTOM: {  // ✅ Aynı kaldı
     desc: ""
   }
 };
 
 /**
- * Kategori default image mapping (Wiki kategorileriyle uyumlu)
+ * Template getter (case-insensitive fallback)
  */
-export const HOMEBREW_DEFAULT_IMAGES = {
-  SPELL: '/wiki/spells.png',
-  MONSTER: '/wiki/monsters.png',
-  RACE: '/wiki/races.png',
-  CLASS: '/wiki/classes.png',
-  BACKGROUND: '/wiki/background.png',
-  FEAT: '/wiki/feats.png',
-  MAGIC_ITEM: '/wiki/magic_items.png',
-  WEAPON: '/wiki/weapons.png',
-  ARMOR: '/wiki/armors.png',
-  CONDITION: '/wiki/conditions.png',
-  PLANE: '/wiki/planes.png',
-  CUSTOM: '/wiki/spells.png' // fallback
+export const getTemplate = (category) => {
+  if (!category) return HOMEBREW_TEMPLATES.CUSTOM;
+  
+  // Exact match
+  if (HOMEBREW_TEMPLATES[category]) {
+    return { ...HOMEBREW_TEMPLATES[category] };
+  }
+  
+  // Fallback
+  return { ...HOMEBREW_TEMPLATES.CUSTOM };
 };
 
 /**
- * Homebrew entry için resim URL'i döndür (default image fallback ile)
+ * Kategori default image mapping
+ */
+export const HOMEBREW_DEFAULT_IMAGES = {
+  SPELLS: '/wiki/spells.png',        // ✅ Updated
+  MONSTERS: '/wiki/monsters.png',    // ✅ Updated
+  RACES: '/wiki/races.png',          // ✅ Updated
+  CLASSES: '/wiki/classes.png',      // ✅ Updated
+  BACKGROUND: '/wiki/background.png',
+  FEATS: '/wiki/feats.png',          // ✅ Updated
+  MAGIC_ITEM: '/wiki/magic_items.png',
+  WEAPON: '/wiki/weapons.png',
+  ARMOR: '/wiki/armors.png',
+  CONDITIONS: '/wiki/conditions.png', // ✅ Updated
+  PLANES: '/wiki/planes.png',         // ✅ Updated
+  CUSTOM: '/wiki/spells.png'
+};
+
+/**
+ * Homebrew entry için resim URL'i döndür
  */
 export const getHomebrewImageUrl = (entry) => {
   if (entry?.imageUrl) return entry.imageUrl;
   return HOMEBREW_DEFAULT_IMAGES[entry?.category] || HOMEBREW_DEFAULT_IMAGES.CUSTOM;
 };
 
+/**
+ * Kategori etiketleri (Wiki ile uyumlu)
+ */
 export const CATEGORY_LABELS = {
-  SPELL: "Büyüler",
-  MONSTER: "Canavarlar",
-  RACE: "Irklar",
-  CLASS: "Sınıflar",
+  SPELLS: "Büyüler",          // ✅ Updated
+  MONSTERS: "Canavarlar",     // ✅ Updated
+  RACES: "Irklar",            // ✅ Updated
+  CLASSES: "Sınıflar",        // ✅ Updated
   BACKGROUND: "Geçmişler",
-  FEAT: "Yetenekler",
+  FEATS: "Yetenekler",        // ✅ Updated
   MAGIC_ITEM: "Sihirli Eşyalar",
   WEAPON: "Silahlar",
   ARMOR: "Zırhlar",
-  CONDITION: "Durumlar",
-  PLANE: "Düzlemler",
+  CONDITIONS: "Durumlar",     // ✅ Updated
+  PLANES: "Düzlemler",        // ✅ Updated
   CUSTOM: "Özel"
 };
 
+/**
+ * Kategori açıklamaları
+ */
 export const CATEGORY_DESCRIPTIONS = {
-  SPELL: "Büyüler, karakterlerin kullanabileceği sihirli güçlerdir. Seviye, okul, bileşenler gibi bilgileri içerir.",
-  MONSTER: "Düşman veya NPC yaratıklar. İstatistikler, yetenekler ve eylemler içerir.",
-  RACE: "Oynanabilir ırklar. Yetenek bonusları, özellikler ve alt ırklar.",
-  CLASS: "Karakter sınıfları. Can zarı, yeterlilikler ve sınıf özellikleri.",
+  SPELLS: "Büyüler, karakterlerin kullanabileceği sihirli güçlerdir. Seviye, okul, bileşenler gibi bilgileri içerir.",
+  MONSTERS: "Düşman veya NPC yaratıklar. İstatistikler, yetenekler ve eylemler içerir.",
+  RACES: "Oynanabilir ırklar. Yetenek bonusları, özellikler ve alt ırklar.",
+  CLASSES: "Karakter sınıfları. Can zarı, yeterlilikler ve sınıf özellikleri.",
   BACKGROUND: "Karakter geçmişleri. Beceriler, ekipman ve özel özellikler.",
-  FEAT: "Özel yetenekler. Ön koşullar ve faydalar.",
+  FEATS: "Özel yetenekler. Ön koşullar ve faydalar.",
   MAGIC_ITEM: "Sihirli eşyalar. Nadirlik, uyum ve özellikler.",
   WEAPON: "Silahlar. Hasar, özellikler ve menzil bilgileri.",
   ARMOR: "Zırhlar. ZS, ağırlık ve dezavantaj bilgileri.",
-  CONDITION: "Durum etkileri. Karakterleri etkileyen durumlar.",
-  PLANE: "Varlık düzlemleri. Özellikler ve sakinler.",
+  CONDITIONS: "Durum etkileri. Karakterleri etkileyen durumlar.",
+  PLANES: "Varlık düzlemleri. Özellikler ve sakinler.",
   CUSTOM: "Özel içerik. Kendi kategorinizi oluşturun."
-};
-
-export const getTemplate = (category) => {
-  return JSON.parse(JSON.stringify(HOMEBREW_TEMPLATES[category] || {}));
-};
-
-export const REQUIRED_FIELDS = {
-  SPELL: ['level', 'school', 'desc'],
-  MONSTER: ['size', 'type', 'armor_class', 'hit_points', 'desc'],
-  RACE: ['size', 'speed', 'desc'],
-  CLASS: ['hit_die', 'primary_ability', 'desc'],
-  BACKGROUND: ['skill_proficiencies', 'desc'],
-  FEAT: ['desc'],
-  MAGIC_ITEM: ['type', 'rarity', 'desc'],
-  WEAPON: ['category', 'damage', 'desc'],
-  ARMOR: ['type', 'armor_class', 'desc'],
-  CONDITION: ['effects', 'desc'],
-  PLANE: ['desc'],
-  CUSTOM: ['desc']
 };

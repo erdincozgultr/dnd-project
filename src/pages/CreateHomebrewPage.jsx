@@ -1,40 +1,40 @@
 // src/pages/CreateHomebrewPage.jsx
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
 
-import CategorySelector from '../components/homebrew/create/CategorySelector';
-import HomebrewDisclaimer from '../components/homebrew/create/HomebrewDisclaimer';
-import MarkdownEditor from '../components/homebrew/create/MarkdownEditor';
+import CategorySelector from "../components/homebrew/create/CategorySelector";
+import HomebrewDisclaimer from "../components/homebrew/create/HomebrewDisclaimer";
+import MarkdownEditor from "../components/homebrew/create/MarkdownEditor";
 
 // Form imports
-import SpellForm from '../components/homebrew/create/forms/SpellForm';
-import MonsterForm from '../components/homebrew/create/forms/MonsterForm';
-import RaceForm from '../components/homebrew/create/forms/RaceForm';
-import ClassForm from '../components/homebrew/create/forms/ClassForm';
-import BackgroundForm from '../components/homebrew/create/forms/BackgroundForm';
-import FeatForm from '../components/homebrew/create/forms/FeatForm';
-import MagicItemForm from '../components/homebrew/create/forms/MagicItemForm';
-import WeaponForm from '../components/homebrew/create/forms/WeaponForm';
-import ArmorForm from '../components/homebrew/create/forms/ArmorForm';
-import ConditionForm from '../components/homebrew/create/forms/ConditionForm';
-import PlaneForm from '../components/homebrew/create/forms/PlaneForm';
+import SpellForm from "../components/homebrew/create/forms/SpellForm";
+import MonsterForm from "../components/homebrew/create/forms/MonsterForm";
+import RaceForm from "../components/homebrew/create/forms/RaceForm";
+import ClassForm from "../components/homebrew/create/forms/ClassForm";
+import BackgroundForm from "../components/homebrew/create/forms/BackgroundForm";
+import FeatForm from "../components/homebrew/create/forms/FeatForm";
+import MagicItemForm from "../components/homebrew/create/forms/MagicItemForm";
+import WeaponForm from "../components/homebrew/create/forms/WeaponForm";
+import ArmorForm from "../components/homebrew/create/forms/ArmorForm";
+import ConditionForm from "../components/homebrew/create/forms/ConditionForm";
+import PlaneForm from "../components/homebrew/create/forms/PlaneForm";
 
-import useAxios, { METHODS } from '../hooks/useAxios';
-import { getTemplate } from '../utils/homebrewTemplates';
+import useAxios, { METHODS } from "../hooks/useAxios";
+import { getTemplate } from "../utils/homebrewTemplates";
 
 const CreateHomebrewPage = () => {
   const navigate = useNavigate();
   const { sendRequest, loading } = useAxios();
 
-  const [category, setCategory] = useState('');
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [tags, setTags] = useState('');
+  const [category, setCategory] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [tags, setTags] = useState("");
   const [content, setContent] = useState({});
   const [rulesAccepted, setRulesAccepted] = useState(false);
 
@@ -47,14 +47,14 @@ const CreateHomebrewPage = () => {
     e.preventDefault();
 
     if (!rulesAccepted) {
-      toast.error('Lütfen kuralları okuyup kabul edin');
+      toast.error("Lütfen kuralları okuyup kabul edin");
       return;
     }
 
     const tagsArray = tags
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
 
     const payload = {
       name,
@@ -62,70 +62,84 @@ const CreateHomebrewPage = () => {
       category,
       content,
       tags: tagsArray,
-      imageUrl: imageUrl || null
+      imageUrl: imageUrl || null,
     };
 
     sendRequest({
-      url: '/homebrews',
+      url: "/homebrews",
       method: METHODS.POST,
       data: payload,
       callbackSuccess: (response) => {
-        toast.success('Homebrew içeriğiniz oluşturuldu! Moderatör onayı bekleniyor...', {
-          autoClose: 5000
-        });
+        toast.success(
+          "Homebrew içeriğiniz oluşturuldu! Moderatör onayı bekleniyor...",
+          {
+            autoClose: 5000,
+          }
+        );
         // Formu sıfırla
-        setCategory('');
-        setName('');
-        setDescription('');
-        setImageUrl('');
-        setTags('');
+        setCategory("");
+        setName("");
+        setDescription("");
+        setImageUrl("");
+        setTags("");
         setContent({});
         setRulesAccepted(false);
         // Kullanıcı profiline yönlendir
         setTimeout(() => {
-          navigate('/profil');
+          navigate("/profil");
         }, 2000);
-      }
+      },
     });
   };
-
   const renderCategoryForm = () => {
     if (!category) return null;
 
     switch (category) {
-      case 'SPELL':
+      case "SPELLS": // ✅ SPELL → SPELLS
         return <SpellForm formData={content} onChange={setContent} />;
-      case 'MONSTER':
+
+      case "MONSTERS": // ✅ MONSTER → MONSTERS
         return <MonsterForm formData={content} onChange={setContent} />;
-      case 'RACE':
+
+      case "RACES": // ✅ RACE → RACES
         return <RaceForm formData={content} onChange={setContent} />;
-      case 'CLASS':
+
+      case "CLASSES": // ✅ CLASS → CLASSES
         return <ClassForm formData={content} onChange={setContent} />;
-      case 'BACKGROUND':
-        return <BackgroundForm formData={content} onChange={setContent} />;
-      case 'FEAT':
+
+      case "BACKGROUND": // ✅ Aynı
+        return <BackgroundDetail formData={content} onChange={setContent} />;
+
+      case "FEATS": // ✅ FEAT → FEATS
         return <FeatForm formData={content} onChange={setContent} />;
-      case 'MAGIC_ITEM':
+
+      case "MAGIC_ITEM": // ✅ Aynı
         return <MagicItemForm formData={content} onChange={setContent} />;
-      case 'WEAPON':
+
+      case "WEAPON": // ✅ Aynı
         return <WeaponForm formData={content} onChange={setContent} />;
-      case 'ARMOR':
+
+      case "ARMOR": // ✅ Aynı
         return <ArmorForm formData={content} onChange={setContent} />;
-      case 'CONDITION':
+
+      case "CONDITIONS": // ✅ CONDITION → CONDITIONS
         return <ConditionForm formData={content} onChange={setContent} />;
-      case 'PLANE':
+
+      case "PLANES": // ✅ PLANE → PLANES
         return <PlaneForm formData={content} onChange={setContent} />;
-      case 'CUSTOM':
+
+      case "CUSTOM": // ✅ Aynı
         return (
           <div className="space-y-4">
             <MarkdownEditor
-              value={content.desc || ''}
+              value={content.desc || ""}
               onChange={(e) => setContent({ ...content, desc: e.target.value })}
               label="Özel İçerik Açıklaması"
               required
             />
           </div>
         );
+
       default:
         return (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
@@ -145,21 +159,23 @@ const CreateHomebrewPage = () => {
 
       {/* Hero Header */}
       <div className="relative py-12 overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/8f/0d/4e/8f0d4e4d7a7f5c3e9b2a1d4c5e6f7a8b.jpg')` }}
+          style={{
+            backgroundImage: `url('https://i.pinimg.com/736x/8f/0d/4e/8f0d4e4d7a7f5c3e9b2a1d4c5e6f7a8b.jpg')`,
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-purple-900/80 via-purple-900/70 to-mbg" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft size={18} />
             <span className="text-sm font-bold">Geri Dön</span>
           </button>
-          
+
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
               <Sparkles size={32} className="text-purple-300" />
@@ -180,9 +196,8 @@ const CreateHomebrewPage = () => {
       <div className="container mx-auto px-4 -mt-8">
         <div className="max-w-4xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
-            
             {/* Disclaimer */}
-            <HomebrewDisclaimer 
+            <HomebrewDisclaimer
               onAccept={setRulesAccepted}
               accepted={rulesAccepted}
             />
@@ -230,7 +245,7 @@ const CreateHomebrewPage = () => {
               </div>
 
               {/* Category */}
-              <CategorySelector 
+              <CategorySelector
                 value={category}
                 onChange={handleCategoryChange}
               />
@@ -250,13 +265,13 @@ const CreateHomebrewPage = () => {
                 />
                 {imageUrl && (
                   <div className="mt-3">
-                    <img 
-                      src={imageUrl} 
-                      alt="Önizleme" 
+                    <img
+                      src={imageUrl}
+                      alt="Önizleme"
                       className="w-32 h-32 object-cover rounded-xl border-2 border-cbg"
                       onError={(e) => {
-                        e.target.style.display = 'none';
-                        toast.error('Resim yüklenemedi. URL\'yi kontrol edin.');
+                        e.target.style.display = "none";
+                        toast.error("Resim yüklenemedi. URL'yi kontrol edin.");
                       }}
                     />
                   </div>
@@ -302,7 +317,7 @@ const CreateHomebrewPage = () => {
               >
                 İptal
               </button>
-              
+
               <button
                 type="submit"
                 disabled={loading || !category || !rulesAccepted}
@@ -327,12 +342,12 @@ const CreateHomebrewPage = () => {
             {/* Info Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm text-blue-700">
-                ℹ️ Oluşturduğunuz homebrew içerik <strong>PENDING_APPROVAL</strong> statüsünde 
-                kaydedilecek ve moderatör onayından sonra yayınlanacaktır. 
-                Durum değişiklikleri hakkında bildirim alacaksınız.
+                ℹ️ Oluşturduğunuz homebrew içerik{" "}
+                <strong>PENDING_APPROVAL</strong> statüsünde kaydedilecek ve
+                moderatör onayından sonra yayınlanacaktır. Durum değişiklikleri
+                hakkında bildirim alacaksınız.
               </p>
             </div>
-
           </form>
         </div>
       </div>

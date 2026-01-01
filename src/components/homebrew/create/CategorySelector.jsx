@@ -1,21 +1,28 @@
 // src/components/homebrew/create/CategorySelector.jsx
 
 import React from 'react';
-import { Sparkles, Swords, Users, Shield, ScrollText, Award, Wand2, Axe, Flame, Cloud, Zap } from 'lucide-react';
+import { 
+  Sparkles, Swords, Users, Shield, ScrollText, Award, 
+  Wand2, Axe, Flame, Cloud, Zap 
+} from 'lucide-react';
 import { CATEGORY_LABELS, CATEGORY_DESCRIPTIONS } from '../../../utils/homebrewTemplates';
 
+/**
+ * Kategori iconları
+ * Backend enum isimleri ile uyumlu: SPELLS, MONSTERS, RACES, etc.
+ */
 const CATEGORY_ICONS = {
-  SPELL: Sparkles,
-  MONSTER: Swords,
-  RACE: Users,
-  CLASS: Shield,
+  SPELLS: Sparkles,      // ✅ SPELL → SPELLS
+  MONSTERS: Swords,      // ✅ MONSTER → MONSTERS
+  RACES: Users,          // ✅ RACE → RACES
+  CLASSES: Shield,       // ✅ CLASS → CLASSES
   BACKGROUND: ScrollText,
-  FEAT: Award,
+  FEATS: Award,          // ✅ FEAT → FEATS
   MAGIC_ITEM: Wand2,
   WEAPON: Axe,
   ARMOR: Shield,
-  CONDITION: Flame,
-  PLANE: Cloud,
+  CONDITIONS: Flame,     // ✅ CONDITION → CONDITIONS
+  PLANES: Cloud,         // ✅ PLANE → PLANES
   CUSTOM: Zap
 };
 
@@ -46,6 +53,7 @@ const CategorySelector = ({ value, onChange, disabled = false }) => {
         </select>
       </div>
 
+      {/* Kategori açıklaması */}
       {value && (
         <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
           <div className="flex items-start gap-3">
