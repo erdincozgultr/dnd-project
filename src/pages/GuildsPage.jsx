@@ -1,4 +1,4 @@
-// src/pages/GuildsPage.jsx
+// src/pages/GuildsPage.jsx - FIX: Non-authenticated users can see guilds
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -15,8 +15,6 @@ import {
   Loader2,
   TrendingUp,
   Star,
-  Sparkles,
-  Filter,
 } from "lucide-react";
 import useAxios, { METHODS } from "../hooks/useAxios";
 
@@ -27,25 +25,27 @@ const GuildsPage = () => {
   const [guilds, setGuilds] = useState([]);
   const [filteredGuilds, setFilteredGuilds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("level"); // level, members, xp
+  const [sortBy, setSortBy] = useState("level");
 
   useEffect(() => {
     sendRequest({
       url: "/guilds",
       method: METHODS.GET,
       callbackSuccess: (res) => {
+        console.log("Guilds loaded:", res.data);
         setGuilds(res.data);
         setFilteredGuilds(res.data);
       },
-      showErrorToast: false,
+      callbackError: (err) => {
+        console.error("Failed to load guilds:", err);
+      },
+      showErrorToast: true,  // ✅ FIX: Hataları göster
     });
   }, []);
 
-  // Filter & Sort
   useEffect(() => {
     let result = [...guilds];
 
-    // Search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
@@ -55,32 +55,27 @@ const GuildsPage = () => {
       );
     }
 
-    // Sort
     result.sort((a, b) => {
-      if (sortBy === "level") return b.level - a.level;
-      if (sortBy === "members") return b.memberCount - a.memberCount;
-      if (sortBy === "xp") return b.xp - a.xp;
+      if (sortBy === "level") return (b.level || 0) - (a.level || 0);
+      if (sortBy === "members") return (b.memberCount || 0) - (a.memberCount || 0);
+      if (sortBy === "xp") return (b.xp || 0) - (a.xp || 0);
       return 0;
     });
 
     setFilteredGuilds(result);
   }, [guilds, searchTerm, sortBy]);
 
-  const userGuild = guilds.find(
+  const userGuild = isAuthenticated ? guilds.find(
     (g) =>
       g.currentUserIsMember ||
       g.members?.some((m) => m.username === user?.username) ||
       g.leader?.username === user?.username
-  );
+  ) : null;
 
   return (
     <div className="min-h-screen bg-mbg font-display">
       <Helmet>
         <title>Loncalar | Zar & Kule</title>
-        <meta
-          name="description"
-          content="Zar & Kule loncalarına katıl veya kendi loncanı kur."
-        />
       </Helmet>
 
       {/* Hero Section */}
@@ -112,8 +107,7 @@ const GuildsPage = () => {
               Birlikte <span className="text-purple-400">Güçlen</span>
             </h1>
             <p className="text-white/70 text-lg mb-8 max-w-xl">
-              Bir loncaya katıl, birlikte XP kazan ve diyarın en güçlü topluluğu
-              ol.
+              Bir loncaya katıl, birlikte XP kazan ve diyarın en güçlü topluluğu ol.
             </p>
 
             {/* Search & Filter */}
@@ -137,15 +131,9 @@ const GuildsPage = () => {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="level" className="text-mtf">
-                  Seviyeye Göre
-                </option>
-                <option value="members" className="text-mtf">
-                  Üye Sayısına Göre
-                </option>
-                <option value="xp" className="text-mtf">
-                  XP'ye Göre
-                </option>
+                <option value="level" className="text-mtf">Seviyeye Göre</option>
+                <option value="members" className="text-mtf">Üye Sayısına Göre</option>
+                <option value="xp" className="text-mtf">XP'ye Göre</option>
               </select>
             </div>
           </div>
@@ -163,12 +151,8 @@ const GuildsPage = () => {
                   <Shield size={28} className="text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-purple-600 font-bold">
-                    Senin Loncan
-                  </p>
-                  <p className="text-xl font-black text-mtf">
-                    {userGuild.name}
-                  </p>
+                  <p className="text-sm text-purple-600 font-bold">Senin Loncan</p>
+                  <p className="text-xl font-black text-mtf">{userGuild.name}</p>
                 </div>
               </div>
               <Link
@@ -186,15 +170,11 @@ const GuildsPage = () => {
           <div className="mb-8 p-6 bg-gradient-to-r from-cta/10 to-orange-500/10 border border-cta/20 rounded-2xl">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-xl font-black text-mtf mb-1">
-                  Henüz bir loncan yok!
-                </p>
-                <p className="text-sti">
-                  Bir loncaya katıl veya kendi loncanı kur.
-                </p>
+                <p className="text-xl font-black text-mtf mb-1">Henüz bir loncan yok!</p>
+                <p className="text-sti">Bir loncaya katıl veya kendi loncanı kur.</p>
               </div>
               <Link
-                to="/taverna/loncalar/olustur"
+                to="/taverna/lonca-olustur"
                 className="flex items-center gap-2 px-5 py-2.5 bg-cta text-white rounded-xl font-bold hover:bg-cta-hover transition-colors shadow-lg shadow-cta/30"
               >
                 <Plus size={18} /> Lonca Kur
@@ -225,9 +205,7 @@ const GuildsPage = () => {
           />
           <StatCard
             icon={<TrendingUp size={24} />}
-            value={guilds
-              .reduce((acc, g) => acc + (g.xp || 0), 0)
-              .toLocaleString()}
+            value={guilds.reduce((acc, g) => acc + (g.xp || 0), 0).toLocaleString()}
             label="Toplam XP"
             color="green"
           />
@@ -241,13 +219,11 @@ const GuildsPage = () => {
         ) : filteredGuilds.length === 0 ? (
           <div className="text-center py-20 bg-white border border-cbg rounded-2xl">
             <Shield size={64} className="mx-auto text-cbg mb-4" />
-            <h3 className="text-xl font-black text-mtf mb-2">
-              Lonca Bulunamadı
-            </h3>
+            <h3 className="text-xl font-black text-mtf mb-2">Lonca Bulunamadı</h3>
             <p className="text-sti mb-6">Arama kriterlerine uygun lonca yok.</p>
             {isAuthenticated && (
               <Link
-                to="/taverna/loncalar/olustur"
+                to="/taverna/lonca-olustur"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors"
               >
                 <Plus size={18} /> İlk Loncayı Kur
@@ -266,8 +242,6 @@ const GuildsPage = () => {
   );
 };
 
-// ==================== HELPER COMPONENTS ====================
-
 const StatCard = ({ icon, value, label, color }) => {
   const colors = {
     purple: "bg-purple-500/10 text-purple-500",
@@ -278,16 +252,12 @@ const StatCard = ({ icon, value, label, color }) => {
 
   return (
     <div className="bg-white border border-cbg rounded-2xl p-4 flex items-center gap-4">
-      <div
-        className={`w-12 h-12 rounded-xl ${colors[color]} flex items-center justify-center`}
-      >
+      <div className={`w-12 h-12 rounded-xl ${colors[color]} flex items-center justify-center`}>
         {icon}
       </div>
       <div>
         <p className="text-2xl font-black text-mtf">{value}</p>
-        <p className="text-xs text-sti uppercase tracking-wider font-bold">
-          {label}
-        </p>
+        <p className="text-xs text-sti uppercase tracking-wider font-bold">{label}</p>
       </div>
     </div>
   );
@@ -301,28 +271,18 @@ const GuildCard = ({ guild, rank }) => {
     3: "from-amber-700 to-amber-600",
   };
 
- return (
+  return (
     <Link
       to={`/taverna/loncalar/${guild.id}`}
-      className={`
-        block bg-white border border-cbg rounded-2xl overflow-hidden 
-        hover:shadow-xl hover:-translate-y-1 transition-all duration-300
-        group
-        ${isTopThree ? "ring-2 ring-purple-500/20" : ""}
-      `}
+      className={`block bg-white border border-cbg rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group ${isTopThree ? "ring-2 ring-purple-500/20" : ""}`}
     >
-      {/* Top Bar */}
       <div className="h-2 bg-gradient-to-r from-purple-500 to-indigo-500" />
 
       <div className="p-5">
-        {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            {/* Rank Badge */}
             {isTopThree ? (
-              <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${rankColors[rank]} flex items-center justify-center text-white font-black text-sm`}
-              >
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${rankColors[rank]} flex items-center justify-center text-white font-black text-sm`}>
                 #{rank}
               </div>
             ) : (
@@ -331,21 +291,16 @@ const GuildCard = ({ guild, rank }) => {
               </div>
             )}
 
-            {/* Guild Icon */}
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center">
               <Shield size={24} className="text-purple-500" />
             </div>
           </div>
 
-          {/* Level Badge */}
           <div className="px-3 py-1 bg-purple-500/10 rounded-lg">
-            <span className="text-purple-600 font-black text-sm">
-              Lv.{guild.level || 1}
-            </span>
+            <span className="text-purple-600 font-black text-sm">Lv.{guild.level || 1}</span>
           </div>
         </div>
 
-        {/* Guild Info */}
         <h3 className="text-lg font-black text-mtf mb-1 group-hover:text-purple-600 transition-colors">
           {guild.name}
         </h3>
@@ -353,28 +308,21 @@ const GuildCard = ({ guild, rank }) => {
           {guild.description || "Bu lonca henüz bir açıklama eklememiş."}
         </p>
 
-        {/* ✅ YENİ: XP Progress (Compact) */}
         <div className="mb-4">
           <GuildXPDisplay guild={guild} variant="compact" />
         </div>
 
-        {/* Stats */}
         <div className="flex items-center justify-between pt-4 border-t border-cbg">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-sm text-sti">
-              <Users size={14} className="text-purple-500" />
-              <span className="font-bold">{guild.memberCount || 0}</span>
-              <span className="text-xs">üye</span>
-            </div>
-            {/* XP buradan kaldırıldı, yukarıda progress bar olarak gösteriliyor */}
+          <div className="flex items-center gap-1.5 text-sm text-sti">
+            <Users size={14} className="text-purple-500" />
+            <span className="font-bold">{guild.memberCount || 0}</span>
+            <span className="text-xs">üye</span>
           </div>
 
           <div className="flex items-center gap-1.5 text-sm text-sti">
             <Crown size={14} className="text-yellow-500" />
             <span className="font-medium truncate max-w-[80px]">
-              {guild.leader?.displayName ||
-                guild.leader?.username ||
-                "Bilinmiyor"}
+              {guild.leader?.displayName || guild.leader?.username || "Bilinmiyor"}
             </span>
           </div>
         </div>

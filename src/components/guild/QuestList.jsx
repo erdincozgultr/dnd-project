@@ -1,20 +1,31 @@
+// src/components/guild/QuestList.jsx - UPDATED (QuestCard ayrı)
 import React, { useEffect, useState } from 'react';
-import { Target, Loader2 } from 'lucide-react';
+import { Target, Loader2, Trophy } from 'lucide-react';
 import QuestCard from './QuestCard';
 import useAxios, { METHODS } from '../../hooks/useAxios';
 
 const QuestList = ({ guildId }) => {
   const { sendRequest, loading } = useAxios();
   const [quests, setQuests] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!guildId) return;
+    
+    console.log('Fetching quests for guild:', guildId);
     
     sendRequest({
       url: `/guilds/${guildId}/quests`,
       method: METHODS.GET,
       callbackSuccess: (res) => {
-        setQuests(res.data);
+        console.log('Quests loaded:', res.data);
+        setQuests(res.data || []);
+        setError(null);
+      },
+      callbackError: (err) => {
+        console.error('Quest fetch error:', err);
+        setError('Quest\'ler yüklenemedi');
+        setQuests([]);
       },
       showErrorToast: false,
     });
@@ -28,12 +39,27 @@ const QuestList = ({ guildId }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-12 bg-white border border-cbg rounded-2xl">
+        <Target size={48} className="mx-auto text-red-300 mb-4" />
+        <h3 className="text-lg font-black text-mtf mb-2">Hata</h3>
+        <p className="text-sti">{error}</p>
+      </div>
+    );
+  }
+
   if (quests.length === 0) {
     return (
       <div className="text-center py-12 bg-white border border-cbg rounded-2xl">
         <Target size={48} className="mx-auto text-cbg mb-4" />
         <h3 className="text-lg font-black text-mtf mb-2">Henüz Quest Yok</h3>
-        <p className="text-sti">Yeni quest'ler yakında eklenecek!</p>
+        <p className="text-sti">
+          Quest sistemi henüz aktif değil veya bu lonca için quest oluşturulmamış.
+        </p>
+        <p className="text-xs text-sti mt-2">
+          Yeni guild'ler için quest'ler otomatik oluşturulur.
+        </p>
       </div>
     );
   }
