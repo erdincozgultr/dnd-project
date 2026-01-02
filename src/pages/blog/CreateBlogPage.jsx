@@ -29,11 +29,24 @@ const CreateBlogPage = () => {
   const createBlogMutation = useCreateBlog();
   const updateBlogMutation = useUpdateBlog();
   
-  // Edit mode için blog detail fetch et (eğer state'te yoksa)
-  // Not: useBlogDetail'in enabled parametresi slug null ise otomatik disable olur
-  const shouldFetchBlog = isEditMode && !blogFromState && blogFromState?.slug;
+  // Edit mode için blog detail fetch et
+  // MyBlogsPage'den gelen blog'da content yok, slug ile full blog fetch et
+  const blogSlug = blogFromState?.slug || null;
+  
+  // Debug logging
+  useEffect(() => {
+    if (isEditMode) {
+      console.log('🔍 Edit mode debug:', {
+        id,
+        blogFromState,
+        blogSlug,
+        willFetch: !!blogSlug
+      });
+    }
+  }, [isEditMode, id, blogFromState, blogSlug]);
+  
   const { data: blogDetail, isLoading: blogLoading } = useBlogDetail(
-    shouldFetchBlog ? blogFromState.slug : null
+    isEditMode ? blogSlug : null
   );
 
   // Form state
@@ -79,21 +92,20 @@ const CreateBlogPage = () => {
 
   // Load blog data in edit mode
   useEffect(() => {
-    if (isEditMode) {
-      const blog = blogFromState || blogDetail;
+    if (isEditMode && blogDetail) {
+      console.log('📝 Edit mode - Loading blog data:', blogDetail);
       
-      if (blog) {
-        setTitle(blog.title || '');
-        setContent(blog.content || '');
-        setThumbnailUrl(blog.thumbnailUrl || '');
-        setCategory(blog.category || '');
-        setTags(blog.tags ? blog.tags.join(', ') : '');
-        setCustomSlug(blog.customSlug || '');
-        setSeoTitle(blog.seoTitle || '');
-        setSeoDescription(blog.seoDescription || '');
-      }
+      // blogDetail'den doldur (full data var)
+      setTitle(blogDetail.title || '');
+      setContent(blogDetail.content || '');
+      setThumbnailUrl(blogDetail.thumbnailUrl || '');
+      setCategory(blogDetail.category || '');
+      setTags(blogDetail.tags ? blogDetail.tags.join(', ') : '');
+      setCustomSlug(blogDetail.customSlug || blogDetail.slug || '');
+      setSeoTitle(blogDetail.seoTitle || '');
+      setSeoDescription(blogDetail.seoDescription || '');
     }
-  }, [isEditMode, blogFromState, blogDetail]);
+  }, [isEditMode, blogDetail]);
 
   // Load draft on mount (SADECE create mode'da)
   useEffect(() => {
@@ -170,9 +182,13 @@ const CreateBlogPage = () => {
     try {
       if (isEditMode) {
         // Update existing blog
-        const blog = blogFromState || blogDetail;
+        if (!blogDetail) {
+          toast.error('Blog bilgisi yüklenmedi');
+          return;
+        }
+        
         await updateBlogMutation.mutateAsync({
-          id: blog.id,
+          id: blogDetail.id,
           data: blogData
         });
       } else {
@@ -231,9 +247,13 @@ const CreateBlogPage = () => {
       
       if (isEditMode) {
         // Update existing blog
-        const blog = blogFromState || blogDetail;
+        if (!blogDetail) {
+          toast.error('Blog bilgisi yüklenmedi');
+          return;
+        }
+        
         response = await updateBlogMutation.mutateAsync({
-          id: blog.id,
+          id: blogDetail.id,
           data: blogData
         });
       } else {
@@ -253,7 +273,7 @@ const CreateBlogPage = () => {
   };
 
   // Loading state (edit mode'da blog yüklenirken)
-  if (isEditMode && blogLoading && !blogFromState) {
+  if (isEditMode && (blogLoading || !blogDetail)) {
     return (
       <div className="min-h-screen bg-mbg flex items-center justify-center">
         <div className="text-center">

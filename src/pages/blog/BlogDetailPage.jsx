@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import BlogContent from '../../components/blog/detail/BlogContent';
 import BlogActions from '../../components/blog/detail/BlogActions';
+import CommentSection from '../../components/blog/comments/CommentSection';
 import { useBlogDetail } from '../../hooks/useBlogQueries';
 import { getCategoryConfig } from '../../constants/blogConstants';
 
@@ -215,15 +216,8 @@ const BlogDetailPage = () => {
             <BlogContent content={blog.content} />
           </article>
 
-          {/* TODO: Comment Section */}
-          <div className="bg-white rounded-2xl shadow-xl border border-cbg p-8 mb-8">
-            <h3 className="text-2xl font-bold text-mtf mb-4">
-              💬 Yorumlar
-            </h3>
-            <div className="text-center py-8 text-sti">
-              <p>Yorum özelliği yakında aktif olacak!</p>
-            </div>
-          </div>
+          {/* Comment Section */}
+          <CommentSection blogId={blog.id} />
         </div>
 
         {/* Sticky Action Buttons (Bottom) */}

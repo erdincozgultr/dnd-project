@@ -228,19 +228,15 @@ export const useBlogComments = (blogId, page = 0, size = 20) => {
 /**
  * Yorum ekle
  */
-export const useAddComment = (blogId) => {
+export const useAddComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (content) => 
-      blogCommentService.addComment({ 
-        blogId, 
-        content 
-      }),
+    mutationFn: (data) => blogCommentService.addComment(data),
     
-    onSuccess: () => {
-      // Yorumları yeniden fetch et
-      queryClient.invalidateQueries(['comments', blogId]);
+    onSuccess: (_, variables) => {
+      // Blog yorumlarını invalidate et
+      queryClient.invalidateQueries(['comments', variables.blogId]);
       toast.success('💬 Yorum eklendi!');
     },
     
@@ -253,14 +249,15 @@ export const useAddComment = (blogId) => {
 /**
  * Yorum sil
  */
-export const useDeleteComment = (blogId) => {
+export const useDeleteComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId) => blogCommentService.deleteComment(commentId),
     
     onSuccess: () => {
-      queryClient.invalidateQueries(['comments', blogId]);
+      // Tüm comment query'lerini invalidate et
+      queryClient.invalidateQueries(['comments']);
       toast.success('🗑️ Yorum silindi');
     },
     
