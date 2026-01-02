@@ -4,24 +4,21 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import GuildXPDisplay from "../components/guild/GuildXPDisplay";
+import QuestList from "../components/guild/QuestList";
 import {
   Shield,
   Users,
   Crown,
   ChevronLeft,
   TrendingUp,
-  Star,
   Loader2,
   Settings,
-  LogOut,
   UserPlus,
   Award,
-  Calendar,
-  MessageSquare,
   Flame,
-  ChevronRight,
   Edit3,
-  Trash2,
+  Target,
 } from "lucide-react";
 import useAxios, { METHODS } from "../hooks/useAxios";
 
@@ -103,8 +100,6 @@ const GuildDetailPage = () => {
     });
   };
 
-  const xpProgress = ((guild.xp || 0) % 1000) / 10; // Her 1000 XP'de level atlama varsayımı
-
   return (
     <div className="min-h-screen bg-mbg font-display">
       <Helmet>
@@ -146,120 +141,101 @@ const GuildDetailPage = () => {
         )}
       </div>
 
-      {/* Guild Info Card */}
-      <div className="container mx-auto px-4 -mt-20 relative z-10">
-        <div className="bg-white border border-cbg rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Guild Icon */}
-              <div className="flex-shrink-0">
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow-lg">
-                  <Shield size={48} className="text-white" />
+      {/* Tabs & Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Guild Info Card */}
+        <div className="bg-white border border-cbg rounded-2xl p-6 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
+            {/* Guild Icon */}
+            <div className="flex-shrink-0">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border-2 border-purple-500/30 flex items-center justify-center">
+                <Shield size={48} className="text-purple-500" />
+              </div>
+            </div>
+
+            {/* Guild Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl md:text-4xl font-black text-mtf">
+                  {guild.name}
+                </h1>
+                <div className="px-3 py-1 bg-purple-500 text-white rounded-lg text-sm font-black">
+                  Lv.{guild.level || 1}
                 </div>
               </div>
 
-              {/* Guild Info */}
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-3 mb-2">
-                  <h1 className="text-2xl md:text-3xl font-black text-mtf">
-                    {guild.name}
-                  </h1>
-                  <span className="px-3 py-1 bg-purple-500/10 text-purple-600 font-black text-sm rounded-lg">
-                    Seviye {guild.level || 1}
+              <p className="text-sti mb-4 max-w-2xl">
+                {guild.description || "Bu lonca henüz bir açıklama eklememiş."}
+              </p>
+
+              {/* Stats Row */}
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Users size={18} className="text-purple-500" />
+                  <span className="font-bold text-mtf">
+                    {guild.memberCount || guild.members?.length || 0}
                   </span>
+                  <span className="text-sti text-sm">üye</span>
                 </div>
-
-                <p className="text-sti mb-4 max-w-2xl">
-                  {guild.description ||
-                    "Bu lonca henüz bir açıklama eklememiş."}
-                </p>
-
-                {/* Stats Row */}
-                <div className="flex flex-wrap items-center gap-6 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Users size={18} className="text-purple-500" />
-                    <span className="font-bold text-mtf">
-                      {guild.memberCount || guild.members?.length || 0}
-                    </span>
-                    <span className="text-sti text-sm">üye</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp size={18} className="text-green-500" />
-                    <span className="font-bold text-mtf">
-                      {(guild.xp || 0).toLocaleString()}
-                    </span>
-                    <span className="text-sti text-sm">XP</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Crown size={18} className="text-yellow-500" />
-                    <Link
-                      to={`/profil/${guild.leader?.username}`}
-                      className="font-bold text-mtf hover:text-purple-600 transition-colors"
-                    >
-                      {guild.leader?.displayName || guild.leader?.username}
-                    </Link>
-                    <span className="text-sti text-sm">(Lider)</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp size={18} className="text-green-500" />
+                  <span className="font-bold text-mtf">
+                    {(guild.xp || 0).toLocaleString()}
+                  </span>
+                  <span className="text-sti text-sm">XP</span>
                 </div>
-
-                {/* XP Progress Bar */}
-                <div className="max-w-md">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-sti font-medium">
-                      Sonraki seviyeye
-                    </span>
-                    <span className="text-purple-600 font-bold">
-                      {1000 - ((guild.xp || 0) % 1000)} XP
-                    </span>
-                  </div>
-                  <div className="h-2 bg-cbg rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all"
-                      style={{ width: `${xpProgress}%` }}
-                    />
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Crown size={18} className="text-yellow-500" />
+                  <Link
+                    to={`/profil/${guild.leader?.username}`}
+                    className="font-bold text-mtf hover:text-purple-600 transition-colors"
+                  >
+                    {guild.leader?.displayName || guild.leader?.username}
+                  </Link>
+                  <span className="text-sti text-sm">(Lider)</span>
                 </div>
               </div>
+            </div>
 
-              {/* Actions */}
-              <div className="flex flex-col gap-2 md:items-end">
-                {isAuthenticated && !isMember && (
-                  <button
-                    onClick={handleJoin}
-                    className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors shadow-lg shadow-purple-500/30"
-                  >
-                    <UserPlus size={18} /> Katıl
-                  </button>
-                )}
+            {/* Actions */}
+            <div className="flex flex-col gap-2 md:items-end">
+              {isAuthenticated && !isMember && (
+                <button
+                  onClick={handleJoin}
+                  className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors shadow-lg shadow-purple-500/30"
+                >
+                  <UserPlus size={18} /> Katıl
+                </button>
+              )}
 
-                {isMember && !isLeader && (
-                  <button
-                    onClick={handleLeave}
-                    className="flex items-center gap-2 px-6 py-3 bg-cbg text-sti rounded-xl font-bold hover:bg-red-50 hover:text-red-500 transition-colors"
-                  >
-                    <LogOut size={18} /> Ayrıl
-                  </button>
-                )}
+              {isMember && !isLeader && (
+                <button
+                  onClick={handleLeave}
+                  className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors"
+                >
+                  <UserMinus size={18} /> Ayrıl
+                </button>
+              )}
 
-                {isLeader && (
-                  <button
-                    onClick={handleDelete}
-                    className="flex items-center gap-2 px-6 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold transition-colors"
-                  >
-                    <Trash2 size={18} /> Loncayı Sil
-                  </button>
-                )}
-              </div>
+              {isLeader && (
+                <Link
+                  to={`/taverna/loncalar/${guild.id}/duzenle`}
+                  className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition-colors"
+                >
+                  <Settings size={18} /> Düzenle
+                </Link>
+              )}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Tabs & Content */}
-      <div className="container mx-auto px-4 py-8">
+        <div className="m-6">
+          <GuildXPDisplay guild={guild} variant="full" />
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto">
-          {["members", "activity", "achievements"].map((tab) => (
+          {["members", "quests", "activity", "achievements"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -273,6 +249,7 @@ const GuildDetailPage = () => {
               `}
             >
               {tab === "members" && "Üyeler"}
+              {tab === "quests" && "Görevler"}
               {tab === "activity" && "Aktivite"}
               {tab === "achievements" && "Başarılar"}
             </button>
@@ -303,6 +280,16 @@ const GuildDetailPage = () => {
                   ))}
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "quests" && (
+          <div className="bg-white border border-cbg rounded-2xl p-6">
+            <h3 className="text-lg font-black text-mtf mb-4 flex items-center gap-2">
+              <Target size={20} className="text-purple-500" />
+              Lonca Quest'leri
+            </h3>
+            <QuestList guildId={guild.id} />
           </div>
         )}
 

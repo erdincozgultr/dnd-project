@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import GuildXPDisplay from '../components/guild/GuildXPDisplay';
 import { useSelector } from "react-redux";
 import {
   Shield,
@@ -300,11 +301,13 @@ const GuildCard = ({ guild, rank }) => {
     3: "from-amber-700 to-amber-600",
   };
 
-  return (
+ return (
     <Link
       to={`/taverna/loncalar/${guild.id}`}
       className={`
-        bg-white border border-cbg rounded-2xl overflow-hidden hover:border-purple-500/50 hover:shadow-xl transition-all duration-300 group
+        block bg-white border border-cbg rounded-2xl overflow-hidden 
+        hover:shadow-xl hover:-translate-y-1 transition-all duration-300
+        group
         ${isTopThree ? "ring-2 ring-purple-500/20" : ""}
       `}
     >
@@ -350,6 +353,11 @@ const GuildCard = ({ guild, rank }) => {
           {guild.description || "Bu lonca henüz bir açıklama eklememiş."}
         </p>
 
+        {/* ✅ YENİ: XP Progress (Compact) */}
+        <div className="mb-4">
+          <GuildXPDisplay guild={guild} variant="compact" />
+        </div>
+
         {/* Stats */}
         <div className="flex items-center justify-between pt-4 border-t border-cbg">
           <div className="flex items-center gap-4">
@@ -358,13 +366,7 @@ const GuildCard = ({ guild, rank }) => {
               <span className="font-bold">{guild.memberCount || 0}</span>
               <span className="text-xs">üye</span>
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-sti">
-              <TrendingUp size={14} className="text-green-500" />
-              <span className="font-bold">
-                {(guild.xp || 0).toLocaleString()}
-              </span>
-              <span className="text-xs">XP</span>
-            </div>
+            {/* XP buradan kaldırıldı, yukarıda progress bar olarak gösteriliyor */}
           </div>
 
           <div className="flex items-center gap-1.5 text-sm text-sti">
