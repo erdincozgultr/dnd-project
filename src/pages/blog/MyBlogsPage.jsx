@@ -129,19 +129,19 @@ const MyBlogsPage = () => {
 
       <div className="min-h-screen bg-mbg">
         {/* Header */}
-        <div className="bg-gradient-to-br from-purple-900 via-red-900 to-purple-900 text-white py-12">
+        <div className=" text-white py-12">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-black mb-2">Bloglarım</h1>
-                <p className="text-white/80">
+                <h1 className="text-4xl font-black mb-2 text-mtf">Bloglarım</h1>
+                <p className="text-mtf">
                   Tüm bloglarınızı buradan yönetin
                 </p>
               </div>
               
               <button
                 onClick={() => navigate('/blog/yaz')}
-                className="flex items-center gap-2 px-6 py-3 bg-white text-cta rounded-xl font-bold hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-white text-cta rounded-xl font-bold hover:bg-cta-hover hover:text-white transition-colors border-cta border-1 hover:border-cta-hover"
               >
                 <Plus size={20} />
                 Yeni Blog Yaz
@@ -261,7 +261,7 @@ const MyBlogsPage = () => {
               </p>
               <button
                 onClick={() => navigate('/blog/yaz')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-cta text-white rounded-xl font-bold hover:bg-red-600 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-cta text-white rounded-xl font-bold hover:bg-cta-hover hover:text-white transition-colors"
               >
                 <Plus size={20} />
                 Yeni Blog Yaz

@@ -154,17 +154,13 @@ const CreateCampaignPage = () => {
       </Helmet>
 
       {/* Hero Header */}
-      <div className="relative py-12 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/c5/0c/8e/c50c8e87f20d1c21f2dabf85f1f054dc.jpg')` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-mbg" />
+      <div className="relative py-12 overflow-hidden bg-mtf">
+        <div className="absolute inset-0" />
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 ">
           <button 
             onClick={() => navigate('/parti-bul')}
-            className="flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors"
+            className="flex items-center gap-2 text-cbg hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft size={18} />
             <span className="text-sm font-bold">Parti Bul'a Dön</span>

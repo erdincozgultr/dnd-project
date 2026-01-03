@@ -117,12 +117,8 @@ const CreateVenuePage = () => {
       </Helmet>
 
       {/* Header */}
-      <div className="relative py-12 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/a8/b2/c4/a8b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7.jpg')` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/90 via-emerald-900/80 to-mbg" />
+      <div className="relative py-12 overflow-hidden bg-mtf">
+        <div className="absolute inset-0" />
         
         <div className="container mx-auto px-4 relative z-10">
           <button 

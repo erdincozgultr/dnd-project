@@ -136,12 +136,8 @@ const VenueDetailPage = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: venue.imageUrl ? `url('${venue.imageUrl}')` : `url('https://i.pinimg.com/736x/a8/b2/c4/a8b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7.jpg')` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-mbg" />
+      <section className="relative py-16 overflow-hidden bg-mtf">
+        <div className="absolute inset-0 " />
         
         <div className="container mx-auto px-4 relative z-10">
           <Link 

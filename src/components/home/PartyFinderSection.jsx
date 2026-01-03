@@ -83,7 +83,7 @@ const PartyFinderSection = () => {
 
             <div className="pt-6">
               <Link 
-                to="/campaigns" 
+                to="/parti-bul" 
                 className="inline-flex items-center gap-3 px-8 py-4 bg-pb text-td hover:bg-cta hover:text-white rounded-xl font-bold text-lg transition-all shadow-xl hover:shadow-cta/20 hover:-translate-y-1 group"
               >
                 İlanlara Göz At 

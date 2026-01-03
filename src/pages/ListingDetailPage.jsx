@@ -121,7 +121,7 @@ const ListingDetailPage = () => {
       </Helmet>
 
       {/* Header */}
-      <div className="bg-gradient-to-b from-amber-900/20 to-mbg py-6">
+      <div className="bg-white border-b border-cbg sticky top-0 z-20 shadow-sm py-6 mb-4">
         <div className="container mx-auto px-4">
           <Link 
             to="/pazar" 

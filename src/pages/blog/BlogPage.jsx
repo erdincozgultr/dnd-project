@@ -53,15 +53,15 @@ const BlogPage = () => {
 
       <div className="min-h-screen bg-mbg">
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-purple-900 via-red-900 to-purple-900 text-white py-16">
+        <div className="text-black py-16">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-4">
-              <BookOpen size={40} />
-              <h1 className="text-4xl md:text-5xl font-black">Blog</h1>
+              <BookOpen size={40} className="text-cta"/>
+              <h1 className="text-4xl md:text-5xl font-mtf font-bold">Blog</h1>
             </div>
-            <p className="text-xl text-white/80 max-w-2xl">
-              D&D maceralarınızı paylaşın, deneyimlerinizden öğrenin. Rehberler,
-              senaryolar ve kampanya günlükleri.
+            <p className="text-xl text-sti max-w-2xl">
+              D&D maceralarınından, deneyimlerden öğrenin. Rehberler,
+              senaryolar ve kampanya günlükleri takip edin.
             </p>
           </div>
         </div>
@@ -74,7 +74,7 @@ const BlogPage = () => {
               {isAuthenticated && (
                 <Link
                   to="/blog/bloglarim"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-cbg hover:border-purple-500 hover:text-purple-500 text-mtf rounded-xl font-bold text-sm transition-all"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-cbg hover:border-cta-hover hover:text-mtf text-mtf rounded-xl font-bold text-sm transition-all"
                 >
                   <FileText size={18} />
                   Bloglarım

@@ -112,7 +112,7 @@ const BlogDetailPage = () => {
 
         {/* Hero Image */}
         {blog.thumbnailUrl && (
-          <div className="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+          <div className="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden sm:h-[600px]">
             <img
               src={blog.thumbnailUrl}
               alt={blog.title}
@@ -122,7 +122,7 @@ const BlogDetailPage = () => {
               }}
             />
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-mbg via-transparent to-transparent"></div>
+            <div className="absolute inset-0 "></div>
           </div>
         )}
 

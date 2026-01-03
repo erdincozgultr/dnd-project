@@ -134,12 +134,8 @@ const CreateListingPage = () => {
       </Helmet>
 
       {/* Header */}
-      <div className="relative py-12 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://i.pinimg.com/736x/2d/3c/4e/2d3c4e5f6a7b8c9d0e1f2a3b4c5d6e7f.jpg')` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-900/90 via-amber-900/80 to-mbg" />
+      <div className="relative py-12 overflow-hidden bg-mtf">
+        <div className="absolute inset-0" />
         
         <div className="container mx-auto px-4 relative z-10">
           <button 

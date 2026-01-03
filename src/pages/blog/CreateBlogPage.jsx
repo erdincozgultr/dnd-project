@@ -331,7 +331,7 @@ const CreateBlogPage = () => {
                 <button
                   onClick={handlePublish}
                   disabled={isSaving}
-                  className="flex items-center gap-2 px-4 py-2 bg-cta text-white rounded-xl font-bold text-sm hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-cta text-white rounded-xl font-bold text-sm hover:bg-cta-hover transition-colors disabled:opacity-50"
                 >
                   <Send size={18} />
                   {isSaving 

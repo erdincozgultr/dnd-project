@@ -55,13 +55,13 @@ const CommunitySection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
-                to="/creators" 
+                to="/basvur" 
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-cta hover:bg-white hover:text-cta text-white rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-cta/40 hover:-translate-y-1"
               >
                 Başvuru Yap <ArrowRight size={20} />
               </Link>
               <Link 
-                to="/community" 
+                to="/taverna" 
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-mbg/5 border border-td/20 text-td hover:bg-mbg/10 rounded-xl font-bold text-lg transition-all"
               >
                 Topluluğu Keşfet
