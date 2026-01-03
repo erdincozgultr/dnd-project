@@ -15,7 +15,7 @@ import {
   Shield,
 } from "lucide-react";
 import { toast } from "react-toastify";
-
+import { calculateXpProgress } from "../utils/xpCalculations";
 import { logout, updateUserSummary } from "../redux/actions/authActions";
 import { fetchUnreadCount } from "../redux/thunks/notificationThunks";
 import useAxios, { METHODS } from "../hooks/useAxios";
@@ -89,7 +89,7 @@ const Header = () => {
       href: "/nasil-oynanir",
     },
     { title: "Wiki", href: "/wiki" },
-    { title: "Blog", href: "/blog"},
+    { title: "Blog", href: "/blog" },
     { title: "Parti Bul", href: "/parti-bul" },
     {
       title: "Taverna",
@@ -249,24 +249,42 @@ const Header = () => {
                         {user.displayName || user.username}
                       </p>
                       <p className="text-xs text-sti">@{user.username}</p>
-                      {user.currentXp !== undefined && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <div className="flex-1 h-1.5 bg-cbg rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-cta rounded-full"
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  user.currentXp % 100
-                                )}%`,
-                              }}
-                            ></div>
-                          </div>
-                          <span className="text-[10px] font-bold text-cta">
-                            {user.currentXp} XP
-                          </span>
-                        </div>
-                      )}
+
+                      {/* XP Progress Bar */}
+                      {user.currentXp !== undefined &&
+                        user.currentXp !== null &&
+                        (() => {
+                          const xpProgress = calculateXpProgress(
+                            user.currentXp,
+                            user.currentRank || "PEASANT"
+                          );
+
+                          return (
+                            <div className="mt-3 space-y-1">
+                              <div className="flex items-center justify-between text-[10px] text-sti">
+                                <span className="font-bold text-cta">
+                                  {user.currentXp} XP
+                                </span>
+                                {!xpProgress.isMaxRank && (
+                                  <span className="text-mtf">
+                                    {xpProgress.nextRank?.title} için{" "}
+                                    <span className="text-cta font-bold">
+                                      +{xpProgress.xpToNextRank}
+                                    </span>
+                                  </span>
+                                )}
+                              </div>
+                              <div className="h-2 bg-cbg rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-cta to-purple-500 rounded-full transition-all duration-500"
+                                  style={{
+                                    width: `${xpProgress.progressPercentage}%`,
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                     </div>
 
                     <div className="p-2">

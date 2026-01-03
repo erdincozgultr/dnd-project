@@ -1,4 +1,5 @@
-import React from "react";
+// src/components/home/WikiSection.jsx
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   BookOpen,
@@ -10,8 +11,48 @@ import {
   Search,
   Library,
 } from "lucide-react";
+import useAxios, { METHODS } from '../../hooks/useAxios';
 
 const WikiSection = () => {
+  const [stats, setStats] = useState({
+    SPELLS: 0,
+    MONSTERS: 0,
+    MAGIC_ITEM: 0,
+    HOMEBREW: 0,
+  });
+  const { sendRequest } = useAxios();
+
+  useEffect(() => {
+    // Wiki kategori istatistiklerini al
+    sendRequest({
+      url: '/wiki/stats/counts',
+      method: METHODS.GET,
+      callbackSuccess: (res) => {
+        setStats(prev => ({
+          ...prev,
+          SPELLS: res.data.SPELLS || 0,
+          MONSTERS: res.data.MONSTERS || 0,
+          MAGIC_ITEM: res.data.MAGIC_ITEM || 0,
+        }));
+      },
+      showErrorToast: false,
+    });
+
+    // Homebrew sayısını al (Topluluk Girdisi)
+    sendRequest({
+      url: '/homebrews/stats/counts',
+      method: METHODS.GET,
+      callbackSuccess: (res) => {
+        const totalHomebrews = Object.values(res.data).reduce((sum, count) => sum + count, 0);
+        setStats(prev => ({
+          ...prev,
+          HOMEBREW: totalHomebrews || 0,
+        }));
+      },
+      showErrorToast: false,
+    });
+  }, []);
+
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -64,10 +105,11 @@ const WikiSection = () => {
           </div>
         </div>
 
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
           <WikiStatCard
             icon={<Sparkles size={28} />}
-            count="350+"
+            count={stats.SPELLS > 0 ? `${stats.SPELLS}+` : '---'}
             label="Büyü & Cantrip"
             subtext="5e & Pathfinder"
             delay="0"
@@ -75,7 +117,7 @@ const WikiSection = () => {
 
           <WikiStatCard
             icon={<Skull size={28} />}
-            count="120+"
+            count={stats.MONSTERS > 0 ? `${stats.MONSTERS}+` : '---'}
             label="Canavar"
             subtext="Bestiary"
             delay="100"
@@ -83,7 +125,7 @@ const WikiSection = () => {
 
           <WikiStatCard
             icon={<Scroll size={28} />}
-            count="200+"
+            count={stats.MAGIC_ITEM > 0 ? `${stats.MAGIC_ITEM}+` : '---'}
             label="Büyülü Eşya"
             subtext="Loot Tables"
             delay="200"
@@ -91,7 +133,7 @@ const WikiSection = () => {
 
           <WikiStatCard
             icon={<Feather size={28} />}
-            count="1.5k"
+            count={stats.HOMEBREW > 0 ? `${stats.HOMEBREW}+` : '---'}
             label="Topluluk Girdisi"
             subtext="Homebrew İçerik"
             delay="300"

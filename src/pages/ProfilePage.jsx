@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Helmet } from "react-helmet-async";
+import { calculateXpProgress, getRankColor } from "../utils/xpCalculations";
 import {
   Shield,
   Award,
@@ -57,17 +58,6 @@ const ProfilePage = () => {
     { id: "badges", label: "Rozetler", icon: <Award size={16} /> },
     { id: "activity", label: "Aktivite", icon: <Flame size={16} /> },
   ];
-
-  const getRankColor = (rank) => {
-    const colors = {
-      PEASANT: "from-gray-500 to-gray-400",
-      ADVENTURER: "from-green-500 to-emerald-400",
-      VETERAN: "from-blue-500 to-cyan-400",
-      HERO: "from-purple-500 to-pink-400",
-      LEGEND: "from-yellow-500 to-orange-400",
-    };
-    return colors[rank] || colors["PEASANT"];
-  };
 
   return (
     <div className="min-h-screen bg-mbg font-display">
@@ -250,50 +240,91 @@ const ProfilePage = () => {
                   İlerleme Durumu
                 </h3>
 
-                <div className="flex items-center gap-4 mb-4">
-                  <div
-                    className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getRankColor(
-                      profile.stats?.rankTier
-                    )} flex items-center justify-center`}
-                  >
-                    <Shield size={32} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xl font-black text-mtf">
-                      {profile.stats?.rankTitle || "Köylü"}
-                    </p>
-                    <p className="text-sm text-sti">Mevcut Rütbe</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-black text-cta">
-                      {profile.stats?.currentXp?.toLocaleString() || 0}
-                    </p>
-                    <p className="text-xs text-sti uppercase">Toplam XP</p>
-                  </div>
-                </div>
+                {(() => {
+                  const currentXp = profile.stats?.currentXp || 0;
+                  const currentRank = profile.stats?.currentRank || "PEASANT";
+                  const xpProgress = calculateXpProgress(
+                    currentXp,
+                    currentRank
+                  );
 
-                {/* XP Bar */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-sti font-medium">
-                    <span>Sonraki rütbeye kalan</span>
-                    <span className="text-cta font-bold">
-                      {profile.stats?.xpToNextRank?.toLocaleString() || 0} XP
-                    </span>
-                  </div>
-                  <div className="h-3 bg-cbg rounded-full overflow-hidden">
-                    <div
-                      className={`h-full bg-gradient-to-r ${getRankColor(
-                        profile.stats?.rankTier
-                      )} rounded-full transition-all duration-500`}
-                      style={{
-                        width: `${Math.min(
-                          100,
-                          100 - ((profile.stats?.xpToNextRank || 0) / 500) * 100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
+                  return (
+                    <>
+                      <div className="flex items-center gap-4 mb-4">
+                        <div
+                          className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getRankColor(
+                            currentRank
+                          )} flex items-center justify-center`}
+                        >
+                          <Shield size={32} className="text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xl font-black text-mtf">
+                            {profile.stats?.rankTitle || "Köylü"}
+                          </p>
+                          <p className="text-sm text-sti">Mevcut Rütbe</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-black text-cta">
+                            {currentXp.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-sti uppercase">
+                            Toplam XP
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* XP Bar */}
+                      <div className="space-y-2">
+                        {xpProgress.isMaxRank ? (
+                          <div className="text-center py-4">
+                            <p className="text-sm font-bold text-yellow-600">
+                              🏆 Maksimum Rütbeye Ulaştınız!
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex justify-between text-xs text-sti font-medium">
+                              <span>Sonraki rütbeye kalan</span>
+                              <span className="text-cta font-bold">
+                                {xpProgress.xpToNextRank.toLocaleString()} XP
+                              </span>
+                            </div>
+                            <div className="relative h-3 bg-cbg rounded-full overflow-hidden">
+                              <div
+                                className={`h-full bg-gradient-to-r ${getRankColor(
+                                  currentRank
+                                )} rounded-full transition-all duration-500`}
+                                style={{
+                                  width: `${xpProgress.progressPercentage}%`,
+                                }}
+                              />
+                            </div>
+                            <div className="flex justify-between text-xs text-sti">
+                              <span>
+                                {xpProgress.xpInCurrentRank.toLocaleString()} XP
+                              </span>
+                              <span>
+                                {xpProgress.xpNeededForNextRank.toLocaleString()}{" "}
+                                XP
+                              </span>
+                            </div>
+                            <p className="text-sm text-center text-sti mt-2">
+                              <strong className="text-mtf">
+                                {xpProgress.nextRank?.title}
+                              </strong>{" "}
+                              rütbesine{" "}
+                              <strong className="text-cta">
+                                {xpProgress.xpToNextRank.toLocaleString()} XP
+                              </strong>{" "}
+                              kaldı
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Statistics Grid */}

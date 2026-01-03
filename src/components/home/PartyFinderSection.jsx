@@ -1,14 +1,34 @@
-import React from 'react';
+// src/components/home/PartyFinderSection.jsx
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Swords, MapPin, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
+import useAxios, { METHODS } from '../../hooks/useAxios';
 
 const PartyFinderSection = () => {
+  const [campaignCount, setCampaignCount] = useState(0);
+  const { sendRequest } = useAxios();
+
+  useEffect(() => {
+    // Kampanya sayısını al
+    sendRequest({
+      url: '/campaigns/public',
+      method: METHODS.GET,
+      params: { page: 0, size: 1 }, // Sadece sayı için
+      callbackSuccess: (res) => {
+        const totalCount = res.data.totalElements || res.data.length || 0;
+        setCampaignCount(totalCount);
+      },
+      showErrorToast: false,
+    });
+  }, []);
+
   return (
     <section className="py-20 md:py-32 bg-mbg overflow-hidden">
       <div className="container mx-auto px-4">
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
+          {/* Görsel */}
           <div className="relative order-first lg:order-none group">
             
             <div className="absolute inset-0 bg-cta/20 rounded-2xl transform translate-x-3 translate-y-3 md:translate-x-6 md:translate-y-6 transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4"></div>
@@ -22,13 +42,17 @@ const PartyFinderSection = () => {
                 className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
               />
               
+              {/* Kampanya Sayısı Badge */}
               <div className="absolute bottom-4 left-4 bg-mbg/90 backdrop-blur-md px-4 py-2 rounded-lg border border-cbg shadow-lg flex items-center gap-2">
                 <Users size={16} className="text-cta" />
-                <span className="text-xs font-bold text-mtf uppercase tracking-wider">GİRDİ SAYISI: 250+</span>
+                <span className="text-xs font-bold text-mtf uppercase tracking-wider">
+                  {campaignCount > 0 ? `${campaignCount}+ Aktif Kampanya` : 'Kampanyalar Yükleniyor...'}
+                </span>
               </div>
             </div>
           </div>
 
+          {/* İçerik */}
           <div className="flex flex-col gap-6">
             
             <div className="flex items-center gap-2 text-cta font-bold tracking-wider uppercase text-sm">
@@ -47,7 +71,8 @@ const PartyFinderSection = () => {
             </h2>
 
             <p className="text-lg text-sti leading-relaxed">
-              Zar & Kule'nin gelişmiş <strong>Party Finder</strong> sistemi ile kendine uygun oyun grubunu bulmak artık çok kolay. İster deneyimli bir Dungeon Master arıyor ol, ister ilk kez zar atacak bir oyuncu; masada senin için her zaman bir yer var.
+              Zar & Kule'nin gelişmiş <strong>Party Finder</strong> sistemi ile kendine uygun oyun grubunu bulmak artık çok kolay. 
+              İster deneyimli bir Dungeon Master arıyor ol, ister ilk kez zar atacak bir oyuncu; masada senin için her zaman bir yer var.
             </p>
 
             <ul className="space-y-4 mt-2">
@@ -76,7 +101,6 @@ const PartyFinderSection = () => {
     </section>
   );
 };
-
 
 const ListItem = ({ text }) => (
   <li className="flex items-start gap-3">

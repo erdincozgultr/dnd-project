@@ -1,10 +1,10 @@
-// src/pages/LeaderboardPage.jsx
+// src/pages/LeaderboardPage.jsx - 3 YENİ SEKME EKLENMİŞ HÂLİ
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   Trophy, Crown, Flame, ScrollText, Users, Shield,
-  ChevronLeft, Loader2, Award, Star, TrendingUp
+  ChevronLeft, Loader2, Award, Star, MessageCircle, Target
 } from 'lucide-react';
 import useAxios, { METHODS } from '../hooks/useAxios';
 
@@ -17,8 +17,11 @@ const LeaderboardPage = () => {
     { id: 'users-xp', label: 'XP Sıralaması', icon: <Trophy size={16} />, endpoint: '/leaderboard/users/xp' },
     { id: 'users-likes', label: 'En Beğenilenler', icon: <Flame size={16} />, endpoint: '/leaderboard/users/likes' },
     { id: 'users-content', label: 'En Üretkenler', icon: <ScrollText size={16} />, endpoint: '/leaderboard/users/content' },
+    { id: 'users-badges', label: 'Rozet Avcıları', icon: <Award size={16} />, endpoint: '/leaderboard/users/badges' }, // ✅ YENİ
+    { id: 'users-comments', label: 'En Aktif Yorumcular', icon: <MessageCircle size={16} />, endpoint: '/leaderboard/users/comments' }, // ✅ YENİ
     { id: 'homebrews', label: 'Top Homebrew', icon: <Star size={16} />, endpoint: '/leaderboard/content/homebrews' },
     { id: 'guilds', label: 'Loncalar', icon: <Shield size={16} />, endpoint: '/leaderboard/guilds/level' },
+    { id: 'guilds-quests', label: 'Quest Şampiyonları', icon: <Target size={16} />, endpoint: '/leaderboard/guilds/quests' }, // ✅ YENİ
   ];
 
   useEffect(() => {
@@ -59,37 +62,35 @@ const LeaderboardPage = () => {
         <div className="container mx-auto px-4">
           <Link 
             to="/taverna" 
-            className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-colors w-fit"
+            className="flex items-center gap-2 text-white/70 hover:text-white text-sm font-bold mb-4 transition-colors"
           >
-            <ChevronLeft size={18} />
-            <span className="text-sm font-bold">Taverna'ya Dön</span>
+            <ChevronLeft size={16} />
+            Tavernaya Dön
           </Link>
-          
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-cta/20 border border-cta/30 flex items-center justify-center">
-              <Trophy size={28} className="text-cta" />
-            </div>
+          <div className="flex items-center gap-3">
+            <Trophy size={32} className="text-cta" />
             <div>
-              <h1 className="text-3xl font-black text-white">Sıralama Tablosu</h1>
-              <p className="text-white/60">Diyarın en güçlü maceracıları</p>
+              <h1 className="text-3xl font-black text-white">Şeref Listesi</h1>
+              <p className="text-white/60">En iyi maceracılar ve loncalar</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-cbg sticky top-20 z-30">
+      <div className="sticky top-20 z-30 bg-mbg border-b border-cbg shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto py-2">
+          <div className="flex gap-2 overflow-x-auto py-4 scrollbar-hide">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all
+                  flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all flex-shrink-0
                   ${activeTab === tab.id 
-                    ? 'bg-cta text-white shadow-lg shadow-cta/20' 
-                    : 'text-sti hover:bg-cbg hover:text-mtf'}
+                    ? 'bg-cta text-white shadow-md' 
+                    : 'text-sti hover:bg-cbg'
+                  }
                 `}
               >
                 {tab.icon}
@@ -102,47 +103,42 @@ const LeaderboardPage = () => {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <Loader2 className="animate-spin text-cta" size={48} />
-            </div>
-          ) : data.length === 0 ? (
-            <div className="text-center py-20 bg-white border border-cbg rounded-2xl">
-              <Trophy size={64} className="mx-auto text-cbg mb-4" />
-              <p className="text-xl font-bold text-mtf mb-2">Henüz veri yok</p>
-              <p className="text-sti">İlk sen ol!</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {data.map((entry, index) => (
-                <LeaderboardRow 
-                  key={entry.id || index}
-                  entry={entry}
-                  rank={entry.rank || index + 1}
-                  type={activeTab}
-                  getRankStyle={getRankStyle}
-                  getRankIcon={getRankIcon}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="animate-spin text-cta" size={48} />
+          </div>
+        ) : data.length > 0 ? (
+          <div className="space-y-3">
+            {data.map((entry) => (
+              <LeaderboardCard
+                key={entry.rank}
+                entry={entry}
+                type={activeTab}
+                rank={entry.rank}
+                getRankStyle={getRankStyle}
+                getRankIcon={getRankIcon}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Trophy size={48} className="mx-auto text-cbg mb-4" />
+            <p className="text-sti font-bold">Henüz veri yok</p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// Row Component
-const LeaderboardRow = ({ entry, rank, type, getRankStyle, getRankIcon }) => {
+const LeaderboardCard = ({ entry, type, rank, getRankStyle, getRankIcon }) => {
   const isUser = type.startsWith('users');
-  const isGuild = type === 'guilds';
+  const isGuild = type.startsWith('guilds');
   const isContent = type === 'homebrews';
 
   return (
     <div className={`
-      flex items-center gap-4 p-4 bg-white border border-cbg rounded-2xl
-      hover:border-cta/30 hover:shadow-lg transition-all
+      bg-white border border-cbg rounded-xl p-4 flex items-center gap-4 transition-all hover:shadow-md
       ${rank <= 3 ? 'ring-2 ring-cta/20' : ''}
     `}>
       {/* Rank */}
@@ -218,13 +214,20 @@ const LeaderboardRow = ({ entry, rank, type, getRankStyle, getRankIcon }) => {
 
       {/* Value */}
       <div className="text-right flex-shrink-0">
-        <p className="text-xl font-black text-cta">{entry.value?.toLocaleString() || entry.level || entry.likeCount || 0}</p>
+        <p className="text-xl font-black text-cta">
+          {type === 'guilds-quests' 
+            ? entry.questsCompleted || 0 
+            : entry.value?.toLocaleString() || entry.level || entry.likeCount || 0}
+        </p>
         <p className="text-[10px] text-sti uppercase tracking-wider font-bold">
-          {isUser && type === 'users-xp' && 'XP'}
-          {isUser && type === 'users-likes' && 'Beğeni'}
-          {isUser && type === 'users-content' && 'İçerik'}
-          {isGuild && 'Seviye'}
-          {isContent && 'Beğeni'}
+          {type === 'users-xp' && 'XP'}
+          {type === 'users-likes' && 'Beğeni'}
+          {type === 'users-content' && 'İçerik'}
+          {type === 'users-badges' && 'Rozet'}
+          {type === 'users-comments' && 'Yorum'}
+          {type === 'guilds' && 'Seviye'}
+          {type === 'guilds-quests' && 'Quest'}
+          {type === 'homebrews' && 'Beğeni'}
         </p>
       </div>
     </div>
