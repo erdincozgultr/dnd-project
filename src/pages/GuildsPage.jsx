@@ -1,8 +1,8 @@
-// src/pages/GuildsPage.jsx - FIX: Non-authenticated users can see guilds
+// src/pages/GuildsPage.jsx
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import GuildXPDisplay from '../components/guild/GuildXPDisplay';
+import GuildXPDisplay from "../components/guild/GuildXPDisplay";
 import { useSelector } from "react-redux";
 import {
   Shield,
@@ -32,14 +32,10 @@ const GuildsPage = () => {
       url: "/guilds",
       method: METHODS.GET,
       callbackSuccess: (res) => {
-        console.log("Guilds loaded:", res.data);
         setGuilds(res.data);
         setFilteredGuilds(res.data);
       },
-      callbackError: (err) => {
-        console.error("Failed to load guilds:", err);
-      },
-      showErrorToast: true,  // ✅ FIX: Hataları göster
+      showErrorToast: true,
     });
   }, []);
 
@@ -57,7 +53,8 @@ const GuildsPage = () => {
 
     result.sort((a, b) => {
       if (sortBy === "level") return (b.level || 0) - (a.level || 0);
-      if (sortBy === "members") return (b.memberCount || 0) - (a.memberCount || 0);
+      if (sortBy === "members")
+        return (b.memberCount || 0) - (a.memberCount || 0);
       if (sortBy === "xp") return (b.xp || 0) - (a.xp || 0);
       return 0;
     });
@@ -65,12 +62,14 @@ const GuildsPage = () => {
     setFilteredGuilds(result);
   }, [guilds, searchTerm, sortBy]);
 
-  const userGuild = isAuthenticated ? guilds.find(
-    (g) =>
-      g.currentUserIsMember ||
-      g.members?.some((m) => m.username === user?.username) ||
-      g.leader?.username === user?.username
-  ) : null;
+  const userGuild = isAuthenticated
+    ? guilds.find(
+        (g) =>
+          g.currentUserIsMember ||
+          g.members?.some((m) => m.username === user?.username) ||
+          g.leader?.username === user?.username
+      )
+    : null;
 
   return (
     <div className="min-h-screen bg-mbg font-display">
@@ -86,7 +85,7 @@ const GuildsPage = () => {
             backgroundImage: `url('/banner/guild.png')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/50 via-purple-900/55 to-mtf" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black-900/35 to-mtf" />
 
         <div className="container mx-auto px-4 relative z-10">
           <Link
@@ -98,16 +97,17 @@ const GuildsPage = () => {
           </Link>
 
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-sm font-bold uppercase tracking-wider mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-sm font-bold uppercase tracking-wider mb-6">
               <Shield size={16} />
               Loncalar
             </div>
 
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
-              Birlikte <span className="text-purple-400">Güçlen</span>
+              Birlikte <span className="text-amber-400">Güçlen</span>
             </h1>
             <p className="text-white/70 text-lg mb-8 max-w-xl">
-              Bir loncaya katıl, birlikte XP kazan ve diyarın en güçlü topluluğu ol.
+              Bir loncaya katıl, birlikte XP kazan ve diyarın en güçlü topluluğu
+              ol.
             </p>
 
             {/* Search & Filter */}
@@ -120,7 +120,7 @@ const GuildsPage = () => {
                 <input
                   type="text"
                   placeholder="Lonca ara..."
-                  className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-md text-white placeholder:text-white/40 rounded-xl border border-white/20 outline-none focus:border-purple-400 transition-colors"
+                  className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-md text-white placeholder:text-white/40 rounded-xl border border-white/20 outline-none focus:border-amber-400 transition-colors"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -131,9 +131,15 @@ const GuildsPage = () => {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="level" className="text-mtf">Seviyeye Göre</option>
-                <option value="members" className="text-mtf">Üye Sayısına Göre</option>
-                <option value="xp" className="text-mtf">XP'ye Göre</option>
+                <option value="level" className="text-mtf">
+                  Seviyeye Göre
+                </option>
+                <option value="members" className="text-mtf">
+                  Üye Sayısına Göre
+                </option>
+                <option value="xp" className="text-mtf">
+                  XP'ye Göre
+                </option>
               </select>
             </div>
           </div>
@@ -144,20 +150,24 @@ const GuildsPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* User's Guild Banner */}
         {isAuthenticated && userGuild && (
-          <div className="mb-8 p-6 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/20 rounded-2xl">
+          <div className="mb-8 p-6 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-2xl">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center">
                   <Shield size={28} className="text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-purple-600 font-bold">Senin Loncan</p>
-                  <p className="text-xl font-black text-mtf">{userGuild.name}</p>
+                  <p className="text-sm text-amber-600 font-bold">
+                    Senin Loncan
+                  </p>
+                  <p className="text-xl font-black text-mtf">
+                    {userGuild.name}
+                  </p>
                 </div>
               </div>
               <Link
                 to={`/taverna/loncalar/${userGuild.id}`}
-                className="flex items-center gap-2 px-5 py-2.5 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors"
               >
                 Loncana Git <ChevronRight size={18} />
               </Link>
@@ -167,15 +177,19 @@ const GuildsPage = () => {
 
         {/* Create Guild CTA */}
         {isAuthenticated && !userGuild && (
-          <div className="mb-8 p-6 bg-gradient-to-r from-cta/10 to-orange-500/10 border border-cta/20 rounded-2xl">
+          <div className="mb-8 p-6 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-2xl">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-xl font-black text-mtf mb-1">Henüz bir loncan yok!</p>
-                <p className="text-sti">Bir loncaya katıl veya kendi loncanı kur.</p>
+                <p className="text-xl font-black text-mtf mb-1">
+                  Henüz bir loncan yok!
+                </p>
+                <p className="text-sti">
+                  Bir loncaya katıl veya kendi loncanı kur.
+                </p>
               </div>
               <Link
                 to="/taverna/lonca-olustur"
-                className="flex items-center gap-2 px-5 py-2.5 bg-cta text-white rounded-xl font-bold hover:bg-cta-hover transition-colors shadow-lg shadow-cta/30"
+                className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/30"
               >
                 <Plus size={18} /> Lonca Kur
               </Link>
@@ -189,7 +203,7 @@ const GuildsPage = () => {
             icon={<Shield size={24} />}
             value={guilds.length}
             label="Toplam Lonca"
-            color="purple"
+            color="amber"
           />
           <StatCard
             icon={<Users size={24} />}
@@ -205,7 +219,9 @@ const GuildsPage = () => {
           />
           <StatCard
             icon={<TrendingUp size={24} />}
-            value={guilds.reduce((acc, g) => acc + (g.xp || 0), 0).toLocaleString()}
+            value={guilds
+              .reduce((acc, g) => acc + (g.xp || 0), 0)
+              .toLocaleString()}
             label="Toplam XP"
             color="green"
           />
@@ -214,17 +230,19 @@ const GuildsPage = () => {
         {/* Guild List */}
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="animate-spin text-purple-500" size={48} />
+            <Loader2 className="animate-spin text-amber-500" size={48} />
           </div>
         ) : filteredGuilds.length === 0 ? (
           <div className="text-center py-20 bg-white border border-cbg rounded-2xl">
             <Shield size={64} className="mx-auto text-cbg mb-4" />
-            <h3 className="text-xl font-black text-mtf mb-2">Lonca Bulunamadı</h3>
+            <h3 className="text-xl font-black text-mtf mb-2">
+              Lonca Bulunamadı
+            </h3>
             <p className="text-sti mb-6">Arama kriterlerine uygun lonca yok.</p>
             {isAuthenticated && (
               <Link
                 to="/taverna/lonca-olustur"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors"
               >
                 <Plus size={18} /> İlk Loncayı Kur
               </Link>
@@ -244,7 +262,7 @@ const GuildsPage = () => {
 
 const StatCard = ({ icon, value, label, color }) => {
   const colors = {
-    purple: "bg-purple-500/10 text-purple-500",
+    amber: "bg-amber-500/10 text-amber-500",
     blue: "bg-blue-500/10 text-blue-500",
     yellow: "bg-yellow-500/10 text-yellow-500",
     green: "bg-green-500/10 text-green-500",
@@ -252,12 +270,16 @@ const StatCard = ({ icon, value, label, color }) => {
 
   return (
     <div className="bg-white border border-cbg rounded-2xl p-4 flex items-center gap-4">
-      <div className={`w-12 h-12 rounded-xl ${colors[color]} flex items-center justify-center`}>
+      <div
+        className={`w-12 h-12 rounded-xl ${colors[color]} flex items-center justify-center`}
+      >
         {icon}
       </div>
       <div>
         <p className="text-2xl font-black text-mtf">{value}</p>
-        <p className="text-xs text-sti uppercase tracking-wider font-bold">{label}</p>
+        <p className="text-xs text-sti uppercase tracking-wider font-bold">
+          {label}
+        </p>
       </div>
     </div>
   );
@@ -274,15 +296,30 @@ const GuildCard = ({ guild, rank }) => {
   return (
     <Link
       to={`/taverna/loncalar/${guild.id}`}
-      className={`block bg-white border border-cbg rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group ${isTopThree ? "ring-2 ring-purple-500/20" : ""}`}
+      className={`block bg-white border border-cbg rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group ${
+        isTopThree ? "ring-2 ring-amber-500/20" : ""
+      }`}
     >
-      <div className="h-2 bg-gradient-to-r from-purple-500 to-indigo-500" />
+      {/* Banner */}
+      {guild.bannerUrl ? (
+        <div className="h-24 bg-gradient-to-r from-amber-500 to-yellow-600 relative overflow-hidden">
+          <img
+            src={guild.bannerUrl}
+            alt={guild.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ) : (
+        <div className="h-2 bg-gradient-to-r from-amber-500 to-yellow-600" />
+      )}
 
       <div className="p-5">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             {isTopThree ? (
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${rankColors[rank]} flex items-center justify-center text-white font-black text-sm`}>
+              <div
+                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${rankColors[rank]} flex items-center justify-center text-white font-black text-sm`}
+              >
                 #{rank}
               </div>
             ) : (
@@ -291,17 +328,30 @@ const GuildCard = ({ guild, rank }) => {
               </div>
             )}
 
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center">
-              <Shield size={24} className="text-purple-500" />
-            </div>
+            {/* Avatar or default icon */}
+            {guild.avatarUrl ? (
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-amber-500/30">
+                <img
+                  src={guild.avatarUrl}
+                  alt={guild.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30 flex items-center justify-center">
+                <Shield size={24} className="text-amber-500" />
+              </div>
+            )}
           </div>
 
-          <div className="px-3 py-1 bg-purple-500/10 rounded-lg">
-            <span className="text-purple-600 font-black text-sm">Lv.{guild.level || 1}</span>
+          <div className="px-3 py-1 bg-amber-500/10 rounded-lg">
+            <span className="text-amber-600 font-black text-sm">
+              Lv.{guild.level || 1}
+            </span>
           </div>
         </div>
 
-        <h3 className="text-lg font-black text-mtf mb-1 group-hover:text-purple-600 transition-colors">
+        <h3 className="text-lg font-black text-mtf mb-1 group-hover:text-amber-600 transition-colors">
           {guild.name}
         </h3>
         <p className="text-sm text-sti line-clamp-2 mb-4">
@@ -314,7 +364,7 @@ const GuildCard = ({ guild, rank }) => {
 
         <div className="flex items-center justify-between pt-4 border-t border-cbg">
           <div className="flex items-center gap-1.5 text-sm text-sti">
-            <Users size={14} className="text-purple-500" />
+            <Users size={14} className="text-amber-500" />
             <span className="font-bold">{guild.memberCount || 0}</span>
             <span className="text-xs">üye</span>
           </div>
@@ -322,7 +372,9 @@ const GuildCard = ({ guild, rank }) => {
           <div className="flex items-center gap-1.5 text-sm text-sti">
             <Crown size={14} className="text-yellow-500" />
             <span className="font-medium truncate max-w-[80px]">
-              {guild.leader?.displayName || guild.leader?.username || "Bilinmiyor"}
+              {guild.leader?.displayName ||
+                guild.leader?.username ||
+                "Bilinmiyor"}
             </span>
           </div>
         </div>

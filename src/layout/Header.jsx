@@ -90,7 +90,6 @@ const Header = () => {
     },
     { title: "Wiki", href: "/wiki" },
     { title: "Blog", href: "/blog" },
-    { title: "Parti Bul", href: "/parti-bul" },
     {
       title: "Taverna",
       href: "/taverna",
@@ -100,6 +99,7 @@ const Header = () => {
         { title: "Rozetler", href: "/taverna/rozetler" },
       ],
     },
+    { title: "Parti Bul", href: "/parti-bul" },
     {
       title: "Dost Mekanlar",
       href: "/mekanlar",
