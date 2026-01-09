@@ -1,70 +1,77 @@
 // src/components/wiki/list/WikiCard.jsx
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Heart,
+  Eye,
+  Sparkles,
+  Shield,
+  Swords,
+  Flame,
+  Zap,
+  Skull,
+  Footprints,
+  Crown,
+  Award,
+} from "lucide-react";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Eye, Sparkles } from 'lucide-react';
-import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
-
-import { 
-  getCategoryConfig, 
-  getCategoryIcon, 
+import {
+  getCategoryConfig,
+  getCategoryIcon,
   getCategoryDefaultImage,
-  LIKE_TARGET_TYPES 
-} from '../../../constants/wikiConstants';
-import { getHomebrewImageUrl } from '../../../utils/homebrewTemplates';
-import axiosClient from '../../../api/axiosClient';
+  LIKE_TARGET_TYPES,
+} from "../../../constants/wikiConstants";
+import { getHomebrewImageUrl } from "../../../utils/homebrewTemplates";
+import axiosClient from "../../../api/axiosClient";
 
 /**
- * Wiki/Homebrew liste kartı
- * @param {object} item - Wiki veya Homebrew entry
- * @param {boolean} isHomebrew - Homebrew içerik mi?
+ * Wiki/Homebrew liste kartı - Kategoriye göre özelleştirilmiş
  */
 const WikiCard = ({ item, isHomebrew = false }) => {
-  const { isAuthenticated } = useSelector(state => state.auth);
-  
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
   const [isLiked, setIsLiked] = useState(item.liked || false);
   const [likeLoading, setLikeLoading] = useState(false);
 
   const categoryConfig = getCategoryConfig(item.category);
-  
-  // Image URL - Homebrew için farklı helper kullan
-  const imageUrl = isHomebrew 
-    ? getHomebrewImageUrl(item)
-    : (item.imageUrl || getCategoryDefaultImage(item.category));
 
-  // Link path - Homebrew için /homebrew/:slug
+  const imageUrl = isHomebrew
+    ? getHomebrewImageUrl(item)
+    : item.imageUrl || getCategoryDefaultImage(item.category);
+
   const linkPath = isHomebrew ? `/homebrew/${item.slug}` : `/wiki/${item.slug}`;
 
   // Beğeni işlemi
   const handleLike = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       toast.info("Beğenmek için giriş yapmalısın.");
       return;
     }
-    
+
     if (likeLoading) return;
-    
+
     setLikeLoading(true);
-    
-    // Optimistic update
+
     const prevLiked = isLiked;
     const prevCount = likeCount;
-    
+
     setIsLiked(!isLiked);
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
-    
+
     try {
-      await axiosClient.post('/likes', {
-        targetType: isHomebrew ? LIKE_TARGET_TYPES.HOMEBREW : LIKE_TARGET_TYPES.WIKI,
-        targetId: item.id
+      await axiosClient.post("/likes", {
+        targetType: isHomebrew
+          ? LIKE_TARGET_TYPES.HOMEBREW
+          : LIKE_TARGET_TYPES.WIKI,
+        targetId: item.id,
       });
     } catch (error) {
-      // Rollback
       setIsLiked(prevLiked);
       setLikeCount(prevCount);
       toast.error("Beğeni işlemi başarısız.");
@@ -73,85 +80,238 @@ const WikiCard = ({ item, isHomebrew = false }) => {
     }
   };
 
+   console.log('WikiCard item:', item);
+  console.log('Category:', item.category);
+  console.log('Level:', item.level);
+  console.log('Type:', item.type);
+  console.log('Challenge Rating:', item.challenge_rating);
+
+  // Kategoriye göre detay bilgileri
+  const renderCategoryDetails = () => {
+    const data = item.categoryData;
+
+    switch (item.category) {
+      case "SPELL":
+      case "SPELLS":
+        return (
+          <div className="flex items-center gap-2 text-xs">
+            {data.level !== undefined && (
+              <span className="px-2 py-0.5 bg-violet-500/10 text-violet-600 rounded font-bold">
+                {data.level === 0 ? "Cantrip" : `${data.level}. Seviye`}
+              </span>
+            )}
+            {data.school && <span className="text-sti">{data.school}</span>}
+          </div>
+        );
+
+      case "MONSTER":
+      case "MONSTERS":
+        return (
+          <div className="flex items-center gap-3 text-xs">
+            {data.type && (
+              <div className="flex items-center gap-1">
+                <Skull size={12} className="text-red-500" />
+                <span className="text-sti">{data.type}</span>
+              </div>
+            )}
+            {data.challenge_rating && (
+              <span className="px-2 py-0.5 bg-red-500/10 text-red-600 rounded font-bold">
+                CR {data.challenge_rating}
+              </span>
+            )}
+          </div>
+        );
+
+      case "MAGIC_ITEM":
+        return (
+          <div className="flex items-center gap-2 text-xs">
+            {data.rarity && (
+              <span
+                className={`px-2 py-0.5 rounded font-bold ${getRarityColor(
+                  data.rarity
+                )}`}
+              >
+                {data.rarity}
+              </span>
+            )}
+            {data.attunement && (
+              <span className="flex items-center gap-1 text-amber-600">
+                <Zap size={12} /> Uyum
+              </span>
+            )}
+          </div>
+        );
+
+      case "WEAPON":
+        return (
+          <div className="flex items-center gap-2 text-xs text-sti">
+            <Swords size={12} className="text-orange-500" />
+            <span>
+              {data.damage?.dice || data.damage_dice || "1d6"}{" "}
+              {data.damage?.type || data.damage_type || "Hasar"}
+            </span>
+          </div>
+        );
+
+      case "ARMOR":
+        return (
+          <div className="flex items-center gap-2 text-xs">
+            <Shield size={12} className="text-blue-500" />
+            <span className="text-sti">
+              Zırh Sınıfı {data.armor_class || data.ac || "11"}
+            </span>
+            {data.type && (
+              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-600 rounded font-bold">
+                {data.type}
+              </span>
+            )}
+          </div>
+        );
+
+      case "CLASS":
+      case "CLASSES":
+        return (
+          <div className="flex items-center gap-2 text-xs">
+            <Crown size={12} className="text-amber-500" />
+            <span className="text-sti">Hit Die: {data.hit_die || "d8"}</span>
+            {data.primary_ability && (
+              <span className="text-amber-600">• {data.primary_ability}</span>
+            )}
+          </div>
+        );
+
+      case "RACE":
+      case "RACES":
+        return (
+          <div className="flex items-center gap-2 text-xs text-sti">
+            <Footprints size={12} className="text-green-500" />
+            <span>{data.size || "Orta"}</span>
+            {data.speed && <span>• {data.speed}</span>}
+          </div>
+        );
+
+      case "FEAT":
+      case "FEATS":
+        return (
+          <div className="flex items-center gap-2 text-xs">
+            <Award size={12} className="text-purple-500" />
+            {data.prerequisite ? (
+              <span className="text-sti">
+                Ön Gereksinim: {data.prerequisite}
+              </span>
+            ) : (
+              <span className="text-sti">Ön Gereksinim Yok</span>
+            )}
+          </div>
+        );
+
+      case "BACKGROUND":
+        return (
+          <div className="text-xs text-sti">
+            {data.skill_proficiencies ? (
+              <span>{data.skill_proficiencies}</span>
+            ) : (
+              <span>Arka Plan</span>
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <Link
       to={linkPath}
-      className="group bg-white border-2 border-cbg rounded-2xl overflow-hidden hover:border-cta/50 hover:shadow-lg transition-all duration-300"
+      className="block bg-white border border-cbg rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
     >
       {/* Image */}
-      <div className="relative h-40 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-          style={{ backgroundImage: `url('${imageUrl}')` }}
-        />
-        
-        {/* Homebrew Badge */}
-        {isHomebrew && (
-          <div className="absolute top-3 right-3 px-3 py-1.5 bg-purple-500/90 backdrop-blur-sm rounded-lg">
-            <div className="flex items-center gap-1.5">
-              <Sparkles size={14} className="text-white" />
-              <span className="text-xs font-bold text-white uppercase tracking-wide">
-                Homebrew
-              </span>
-            </div>
+      <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={item.name || item.title}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            {getCategoryIcon(item.category, 48)}
           </div>
         )}
-        
-        {/* Category badge */}
-        <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg">
-          <div className="flex items-center gap-1">
-            {getCategoryIcon(item.category, 14)}
-            <span className="text-xs font-bold text-white uppercase tracking-wide">
-              {categoryConfig.label}
-            </span>
+
+        {/* Homebrew Badge */}
+        {isHomebrew && (
+          <div className="absolute top-2 right-2 px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-lg flex items-center gap-1 shadow-lg">
+            <Sparkles size={12} />
+            Homebrew
           </div>
+        )}
+
+        {/* Category Badge */}
+        <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-bold uppercase rounded">
+          {categoryConfig.name}
         </div>
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-lg font-black text-mtf group-hover:text-cta transition-colors line-clamp-2 mb-2">
-          {item.title || item.name}
+        {/* Title */}
+        <h3 className="font-bold text-mtf group-hover:text-cta transition-colors truncate mb-2">
+          {item.name || item.title}
         </h3>
-        
-        {item.description && (
-          <p className="text-sm text-sti line-clamp-2 mb-3">
-            {item.description}
+
+        {/* Category Details */}
+        <div className="mb-3 min-h-[24px]">{renderCategoryDetails()}</div>
+
+        {/* Author (Homebrew için) */}
+        {isHomebrew && item.author && (
+          <p className="text-xs text-sti mb-3">
+            Yazar: {item.author.displayName || item.author.username}
           </p>
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-3 text-xs">
-          <button
-            onClick={handleLike}
-            disabled={likeLoading}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-bold transition-all ${
-              isLiked 
-                ? 'bg-red-100 text-red-500' 
-                : 'bg-mbg text-sti hover:bg-red-50 hover:text-red-500'
-            } ${likeLoading ? 'opacity-50' : ''}`}
-          >
-            <Heart size={14} className={isLiked ? 'fill-current' : ''} />
-            <span>{likeCount}</span>
-          </button>
+        <div className="flex items-center justify-between pt-3 border-t border-cbg">
+          <div className="flex items-center gap-3 text-xs text-sti">
+            <button
+              onClick={handleLike}
+              disabled={likeLoading}
+              className={`flex items-center gap-1 transition-colors ${
+                isLiked ? "text-red-500" : "hover:text-red-500"
+              }`}
+            >
+              <Heart size={14} fill={isLiked ? "currentColor" : "none"} />
+              {likeCount}
+            </button>
 
-          {item.viewCount !== undefined && (
-            <div className="flex items-center gap-1 text-sti">
+            <span className="flex items-center gap-1">
               <Eye size={14} />
-              <span>{item.viewCount}</span>
-            </div>
-          )}
-
-          {/* Homebrew Author */}
-          {isHomebrew && item.authorUsername && (
-            <div className="ml-auto text-purple-600 font-bold">
-              @{item.authorUsername}
-            </div>
-          )}
+              {item.viewCount || 0}
+            </span>
+          </div>
         </div>
       </div>
     </Link>
   );
+};
+
+// Rarity renk yardımcısı
+const getRarityColor = (rarity) => {
+  const r = rarity?.toLowerCase();
+  if (r?.includes("common") || r?.includes("sıradan"))
+    return "bg-gray-500/10 text-gray-600";
+  if (r?.includes("uncommon") || r?.includes("nadide"))
+    return "bg-green-500/10 text-green-600";
+  if (r?.includes("rare") || r?.includes("nadir"))
+    return "bg-blue-500/10 text-blue-600";
+  if (r?.includes("very rare") || r?.includes("çok nadir"))
+    return "bg-purple-500/10 text-purple-600";
+  if (r?.includes("legendary") || r?.includes("efsanevi"))
+    return "bg-amber-500/10 text-amber-600";
+  if (r?.includes("artifact") || r?.includes("artifact"))
+    return "bg-red-500/10 text-red-600";
+  return "bg-gray-500/10 text-gray-600";
 };
 
 export default WikiCard;

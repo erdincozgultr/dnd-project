@@ -1,17 +1,26 @@
-// src/pages/WikiPage.jsx
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import {
+  BookOpen,
+  Loader2,
+  Menu,
+  X,
+  AlertCircle,
+  Sparkles,
+} from "lucide-react";
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { BookOpen, Loader2, Menu, X, AlertCircle, Sparkles } from 'lucide-react';
+import {
+  fetchWikiEntries,
+  fetchCategoryStats,
+  setContentType,
+} from "../redux/actions/wikiActions";
+import { getCategoryLabel } from "../constants/wikiConstants";
 
-import { fetchWikiEntries, fetchCategoryStats, setContentType } from '../redux/actions/wikiActions';
-import { getCategoryLabel } from '../constants/wikiConstants';
-
-import WikiSidebar from '../components/wiki/layout/WikiSidebar';
-import WikiCard from '../components/wiki/list/WikiCard';
-import WikiPagination from '../components/wiki/list/WikiPagination';
+import WikiSidebar from "../components/wiki/layout/WikiSidebar";
+import WikiCard from "../components/wiki/list/WikiCard";
+import WikiPagination from "../components/wiki/list/WikiPagination";
 
 /**
  * Wiki ana sayfası - Resmi + Homebrew içerikler
@@ -20,23 +29,24 @@ const WikiPage = () => {
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  const { 
-    entries, 
-    loading, 
-    error, 
-    activeCategory, 
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const {
+    entries,
+    loading,
+    error,
+    activeCategory,
     searchQuery,
     pagination,
-    contentType 
-  } = useSelector(state => state.wiki);
+    contentType,
+  } = useSelector((state) => state.wiki);
 
   // URL'den tab parametresi al
-  const tabFromUrl = searchParams.get('tab') || 'official';
+  const tabFromUrl = searchParams.get("tab") || "official";
 
   // İlk yükleme ve tab değişimi
   useEffect(() => {
-    const newContentType = tabFromUrl === 'homebrew' ? 'homebrew' : 'official';
+    const newContentType = tabFromUrl === "homebrew" ? "homebrew" : "official";
     dispatch(setContentType(newContentType));
   }, [tabFromUrl, dispatch]);
 
@@ -54,14 +64,19 @@ const WikiPage = () => {
   const getPageTitle = () => {
     if (searchQuery) return `"${searchQuery}" araması`;
     if (activeCategory) return getCategoryLabel(activeCategory);
-    return contentType === 'homebrew' ? 'Homebrew İçerikler' : 'Resmi İçerikler';
+    return contentType === "homebrew"
+      ? "Homebrew İçerikler"
+      : "Resmi İçerikler";
   };
 
   return (
     <div className="min-h-screen bg-mbg font-display">
       <Helmet>
         <title>D&D Kütüphanesi - Zar & Kule</title>
-        <meta name="description" content="D&D 5e resmi içerikleri ve topluluk tarafından oluşturulan homebrew içerikler." />
+        <meta
+          name="description"
+          content="D&D 5e resmi içerikleri ve topluluk tarafından oluşturulan homebrew içerikler."
+        />
       </Helmet>
 
       <div className="container mx-auto px-4 py-8">
@@ -73,18 +88,20 @@ const WikiPage = () => {
             </div>
             <div>
               <h1 className="text-2xl font-black text-mtf">D&D Kütüphanesi</h1>
-              <p className="text-sm text-sti">Resmi içerikler ve homebrew materyaller</p>
+              <p className="text-sm text-sti">
+                Resmi içerikler ve homebrew materyaller
+              </p>
             </div>
           </div>
 
           {/* Tabs */}
           <div className="flex items-center gap-2 bg-white border-2 border-cbg rounded-xl p-1.5 sm:w-">
             <button
-              onClick={() => handleTabChange('official')}
+              onClick={() => handleTabChange("official")}
               className={`flex-1 px-6 py-3 rounded-lg font-bold text-sm transition-all ${
-                contentType === 'official'
-                  ? 'bg-cta text-white shadow-md'
-                  : 'text-sti hover:text-mtf hover:bg-slate-50'
+                contentType === "official"
+                  ? "bg-cta text-white shadow-md"
+                  : "text-sti hover:text-mtf hover:bg-slate-50"
               }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -93,11 +110,11 @@ const WikiPage = () => {
               </div>
             </button>
             <button
-              onClick={() => handleTabChange('homebrew')}
+              onClick={() => handleTabChange("homebrew")}
               className={`flex-1 px-6 py-3 rounded-lg font-bold text-sm transition-all ${
-                contentType === 'homebrew'
-                  ? 'bg-pb text-white shadow-md'
-                  : 'text-sti hover:text-mtf hover:bg-slate-50'
+                contentType === "homebrew"
+                  ? "bg-pb text-white shadow-md"
+                  : "text-sti hover:text-mtf hover:bg-slate-50"
               }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -109,34 +126,43 @@ const WikiPage = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          
           {/* Mobil Sidebar Toggle */}
           <div className="lg:hidden">
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="flex items-center gap-2 bg-white border border-cbg px-4 py-2.5 rounded-xl shadow-sm text-mtf font-bold w-full justify-center"
             >
               {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-              {isSidebarOpen ? 'Filtreleri Kapat' : 'Kategoriler & Filtreler'}
+              {isSidebarOpen ? "Filtreleri Kapat" : "Kategoriler & Filtreler"}
             </button>
           </div>
 
           {/* Sidebar */}
-          <aside className={`
+          <aside
+            className={`
             fixed inset-y-0 left-0 z-40 w-80 bg-mbg p-6 overflow-y-auto transition-transform duration-300 
             lg:translate-x-0 lg:static lg:z-auto lg:p-0 lg:w-72 lg:flex-shrink-0
-            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          `}>
+            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+          >
             {isSidebarOpen && (
-              <button 
+              <button
                 onClick={() => setIsSidebarOpen(false)}
                 className="lg:hidden absolute top-4 right-4 p-2 hover:bg-cbg rounded-lg transition-colors"
               >
                 <X size={24} className="text-sti" />
               </button>
             )}
-            
-            <div className="lg:sticky lg:top-24">
+            {isAuthenticated && (
+              <Link
+                to="/homebrews/me"
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 transition-colors shadow-lg shadow-purple-500/30"
+              >
+                <Sparkles size={18} />
+                Homebrew'larım
+              </Link>
+            )}
+            <div className="lg:sticky lg:top-24 mt-12">
               <WikiSidebar onCategorySelect={() => setIsSidebarOpen(false)} />
             </div>
           </aside>
@@ -145,7 +171,9 @@ const WikiPage = () => {
           <main className="flex-1">
             {/* Başlık */}
             <div className="mb-6">
-              <h2 className="text-xl font-black text-mtf mb-2">{getPageTitle()}</h2>
+              <h2 className="text-xl font-black text-mtf mb-2">
+                {getPageTitle()}
+              </h2>
               <p className="text-sm text-sti">
                 {pagination.totalElements} sonuç bulundu
               </p>
@@ -155,7 +183,10 @@ const WikiPage = () => {
             {loading && (
               <div className="flex justify-center py-20">
                 <div className="text-center">
-                  <Loader2 size={48} className="animate-spin text-cta mx-auto mb-4" />
+                  <Loader2
+                    size={48}
+                    className="animate-spin text-cta mx-auto mb-4"
+                  />
                   <p className="text-sti font-bold">Yükleniyor...</p>
                 </div>
               </div>
@@ -165,7 +196,9 @@ const WikiPage = () => {
             {error && (
               <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center">
                 <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-red-700 mb-2">Bir Hata Oluştu</h3>
+                <h3 className="text-lg font-bold text-red-700 mb-2">
+                  Bir Hata Oluştu
+                </h3>
                 <p className="text-red-600">{error}</p>
               </div>
             )}
@@ -174,14 +207,15 @@ const WikiPage = () => {
             {!loading && !error && entries.length === 0 && (
               <div className="bg-white border-2 border-cbg rounded-2xl p-12 text-center">
                 <BookOpen size={64} className="text-cbg mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-mtf mb-2">İçerik Bulunamadı</h3>
+                <h3 className="text-xl font-bold text-mtf mb-2">
+                  İçerik Bulunamadı
+                </h3>
                 <p className="text-sti">
-                  {searchQuery 
+                  {searchQuery
                     ? `"${searchQuery}" için sonuç bulunamadı.`
-                    : contentType === 'homebrew'
-                    ? 'Henüz homebrew içerik oluşturulmamış.'
-                    : 'Bu kategoride henüz içerik yok.'
-                  }
+                    : contentType === "homebrew"
+                    ? "Henüz homebrew içerik oluşturulmamış."
+                    : "Bu kategoride henüz içerik yok."}
                 </p>
               </div>
             )}
@@ -190,11 +224,11 @@ const WikiPage = () => {
             {!loading && !error && entries.length > 0 && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {entries.map(entry => (
-                    <WikiCard 
-                      key={entry.id} 
+                  {entries.map((entry) => (
+                    <WikiCard
+                      key={entry.id}
                       item={entry}
-                      isHomebrew={contentType === 'homebrew'}
+                      isHomebrew={contentType === "homebrew"}
                     />
                   ))}
                 </div>

@@ -1,5 +1,5 @@
 // src/layout/PageContent.jsx - BLOG ROUTES EKLENDİ
-
+import MyHomebrewsPage from "../pages/MyHomebrewsPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import SettingsPage from "../pages/SettingsPage";
 import HomePage from "../pages/HomePage";
@@ -25,40 +25,52 @@ import VenuesPage from "../pages/VenuesPage";
 import VenueDetailPage from "../pages/VenueDetailPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
 import NotificationsPage from "../pages/NotificationsPage";
-
-// Blog pages - YENİ ✨
 import BlogPage from "../pages/blog/BlogPage";
 import BlogDetailPage from "../pages/blog/BlogDetailPage";
 import CreateBlogPage from "../pages/blog/CreateBlogPage";
 import MyBlogsPage from "../pages/blog/MyBlogsPage";
+import AboutPage from "../pages/AboutPage";
+import ContactPage from "../pages/ContactPage";
+import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
+import TermsOfServicePage from "../pages/TermsOfServicePage";
 
 const PageContent = () => {
   return (
     <Routes>
       {/* Ana Sayfa */}
       <Route path="/" element={<HomePage />} />
-      
+
       {/* Blog - YENİ ✨ */}
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
       <Route path="/blog/yaz" element={<CreateBlogPage />} />
       <Route path="/blog/duzenle/:id" element={<CreateBlogPage />} />
       <Route path="/blog/bloglarim" element={<MyBlogsPage />} />
-      
+
       {/* Wiki & Homebrew */}
       <Route path="/wiki" element={<WikiPage />} />
       <Route path="/wiki/:slug" element={<WikiDetailPage type="official" />} />
-      <Route path="/homebrew/:slug" element={<WikiDetailPage type="homebrew" />} />
+      <Route
+        path="/homebrew/:slug"
+        element={<WikiDetailPage type="homebrew" />}
+      />
       <Route path="/create-homebrew" element={<CreateHomebrewPage />} />
       <Route path="/collections/me" element={<MyCollectionsPage />} />
+      <Route path="/homebrews/me" element={<MyHomebrewsPage />} />
 
       {/* Dost Mekanlar */}
       <Route path="/mekanlar" element={<VenuesPage />} />
       <Route path="/mekanlar/:id" element={<VenueDetailPage />} />
       <Route path="/mekanlar/ekle" element={<CreateVenuePage />} />
       <Route path="/venues" element={<Navigate to="/mekanlar" replace />} />
-      <Route path="/venues/:id" element={<Navigate to="/mekanlar/:id" replace />} />
-      <Route path="/venues/new" element={<Navigate to="/mekanlar/ekle" replace />} />
+      <Route
+        path="/venues/:id"
+        element={<Navigate to="/mekanlar/:id" replace />}
+      />
+      <Route
+        path="/venues/new"
+        element={<Navigate to="/mekanlar/ekle" replace />}
+      />
 
       {/* Taverna */}
       <Route path="/taverna" element={<TavernaPage />} />
@@ -68,8 +80,14 @@ const PageContent = () => {
       <Route path="/taverna/lonca-olustur" element={<CreateGuildPage />} />
       <Route path="/taverna/lonca-duzenle/:id" element={<CreateGuildPage />} />
       <Route path="/taverna/rozetler" element={<BadgesPage />} />
-      <Route path="/guilds" element={<Navigate to="/taverna/loncalar" replace />} />
-      <Route path="/guilds/:id" element={<Navigate to="/taverna/loncalar/:id" replace />} />
+      <Route
+        path="/guilds"
+        element={<Navigate to="/taverna/loncalar" replace />}
+      />
+      <Route
+        path="/guilds/:id"
+        element={<Navigate to="/taverna/loncalar/:id" replace />}
+      />
 
       {/* Bit Pazarı */}
       <Route path="/pazar" element={<MarketplacePage />} />
@@ -80,25 +98,43 @@ const PageContent = () => {
 
       {/* Profil & Ayarlar */}
       <Route path="/profil/:username" element={<ProfilePage />} />
-      <Route path="/profile/:username" element={<Navigate to="/profil/:username" replace />} />
+      <Route
+        path="/profile/:username"
+        element={<Navigate to="/profil/:username" replace />}
+      />
       <Route path="/ayarlar" element={<SettingsPage />} />
 
       {/* Campaign / Parti Bul */}
       <Route path="/parti-bul" element={<PartyFinderPage />} />
-      <Route path="/party-finder" element={<Navigate to="/parti-bul" replace />} />
+      <Route
+        path="/party-finder"
+        element={<Navigate to="/parti-bul" replace />}
+      />
       <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
       <Route path="/kampanya-duzenle/:id" element={<CreateCampaignPage />} />
-      <Route path="/create-campaign" element={<Navigate to="/kampanya-olustur" replace />} />
+      <Route
+        path="/create-campaign"
+        element={<Navigate to="/kampanya-olustur" replace />}
+      />
 
       {/* Notifications */}
       <Route path="/bildirimler" element={<NotificationsPage />} />
-      <Route path="/notifications" element={<Navigate to="/bildirimler" replace />} />
+      <Route
+        path="/notifications"
+        element={<Navigate to="/bildirimler" replace />}
+      />
 
       {/* Auth */}
       <Route path="/giris" element={<LoginPage />} />
       <Route path="/login" element={<Navigate to="/giris" replace />} />
       <Route path="/kayit" element={<RegisterPage />} />
       <Route path="/register" element={<Navigate to="/kayit" replace />} />
+
+      {/* Footer */}
+      <Route path="/hakkimizda" element={<AboutPage />} />
+      <Route path="/iletisim" element={<ContactPage />} />
+      <Route path="/gizlilik" element={<PrivacyPolicyPage />} />
+      <Route path="/kullanim-sartlari" element={<TermsOfServicePage />} />
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
