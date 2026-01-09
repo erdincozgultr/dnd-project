@@ -106,25 +106,6 @@ const ContactPage = () => {
               </p>
             </div>
 
-            {/* SSS Yönlendirmesi */}
-            <div className="bg-cta/10 border-2 border-cta/20 rounded-2xl p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <HelpCircle size={20} className="text-cta" />
-                <h3 className="font-bold text-mtf">Hızlı Çözüm</h3>
-              </div>
-              <p className="text-sm text-sti mb-4">
-                Teknik sorularınız için önce SSS sayfamızı kontrol edin. 
-                Birçok yaygın sorunun çözümünü burada bulabilirsiniz.
-              </p>
-              <Link
-                to="/sss"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-cta text-white rounded-lg font-bold text-sm hover:bg-cta-hover transition-colors"
-              >
-                <HelpCircle size={16} />
-                SSS'ye Git
-              </Link>
-            </div>
-
             {/* Adres Bilgisi */}
             <div className="bg-white border-2 border-cbg rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-3">

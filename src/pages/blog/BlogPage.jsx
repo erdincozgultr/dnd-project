@@ -53,11 +53,11 @@ const BlogPage = () => {
 
       <div className="min-h-screen bg-mbg">
         {/* Hero Section */}
-        <div className="text-black py-16">
+        <div className="text-black py-16 bg-mtf">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-4">
               <BookOpen size={40} className="text-cta"/>
-              <h1 className="text-4xl md:text-5xl font-mtf font-bold">Blog</h1>
+              <h1 className="text-4xl md:text-5xl text-white font-bold">Blog</h1>
             </div>
             <p className="text-xl text-sti max-w-2xl">
               D&D maceralarınından, deneyimlerden öğrenin. Rehberler,

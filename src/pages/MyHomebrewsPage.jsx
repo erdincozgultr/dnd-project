@@ -73,7 +73,7 @@ const MyHomebrewsPage = () => {
       </Helmet>
 
       {/* Hero */}
-      <section className="relative py-16 overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600">
+      <section className="relative py-16 overflow-hidden bg-mtf">
         <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
         <div className="container mx-auto px-4 relative z-10">
           <Link
@@ -92,7 +92,7 @@ const MyHomebrewsPage = () => {
               </div>
               
               <h1 className="text-4xl md:text-5xl font-black text-white mb-2">
-                Senin <span className="text-pink-200">Kreasyonların</span>
+                Senin <span className="text-cta">Kreasyonların</span>
               </h1>
               
               <p className="text-white/80">
@@ -102,7 +102,7 @@ const MyHomebrewsPage = () => {
 
             <Link
               to="/create-homebrew"
-              className="flex items-center gap-2 px-6 py-3 bg-white text-purple-600 rounded-xl font-bold hover:bg-pink-50 transition-colors shadow-lg"
+              className="flex items-center gap-2 px-6 py-3 bg-white text-cta rounded-xl font-bold hover:bg-pink-50 transition-colors shadow-lg"
             >
               <Plus size={20} /> Yeni Homebrew
             </Link>
@@ -143,7 +143,7 @@ const MyHomebrewsPage = () => {
                 className={`
                   px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all
                   ${selectedCategory === cat.id
-                    ? 'bg-purple-500 text-white shadow-lg'
+                    ? 'bg-cta text-white shadow-lg'
                     : 'bg-white border border-cbg text-sti hover:border-purple-500/50'
                   }
                 `}
@@ -171,7 +171,7 @@ const MyHomebrewsPage = () => {
             <p className="text-sti mb-6">İlk homebrew'unu oluşturarak başla!</p>
             <Link
               to="/create-homebrew"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-cta text-white rounded-xl font-bold hover:bg-mtf transition-colors"
             >
               <Plus size={18} /> Homebrew Oluştur
             </Link>

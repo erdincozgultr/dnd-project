@@ -156,7 +156,7 @@ const WikiPage = () => {
             {isAuthenticated && (
               <Link
                 to="/homebrews/me"
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 transition-colors shadow-lg shadow-purple-500/30"
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cta to-mtf text-white rounded-xl font-bold hover:from-mtf hover:to-cta transition-colors shadow-lg shadow-purple-500/30"
               >
                 <Sparkles size={18} />
                 Homebrew'larım

@@ -1,16 +1,28 @@
-// src/layout/PageContent.jsx - BLOG ROUTES EKLENDİ
-import MyHomebrewsPage from "../pages/MyHomebrewsPage";
 import { Routes, Route, Navigate } from "react-router-dom";
-import SettingsPage from "../pages/SettingsPage";
+import ProtectedRoute from "../components/ProtectedRoute";
+
+// Pages imports
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
-import PartyFinderPage from "../pages/PartyFinderPage";
-import CreateCampaignPage from "../pages/CreateCampaignPage";
 import WikiPage from "../pages/WikiPage";
 import WikiDetailPage from "../pages/WikiDetailPage";
+import BlogPage from "../pages/blog/BlogPage";
+import BlogDetailPage from "../pages/blog/BlogDetailPage";
+import CreateBlogPage from "../pages/blog/CreateBlogPage";
+import MyBlogsPage from "../pages/blog/MyBlogsPage";
+import AboutPage from "../pages/AboutPage";
+import ContactPage from "../pages/ContactPage";
+import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
+import TermsOfServicePage from "../pages/TermsOfServicePage";
+
+// Protected pages
+import SettingsPage from "../pages/SettingsPage";
+import PartyFinderPage from "../pages/PartyFinderPage";
+import CreateCampaignPage from "../pages/CreateCampaignPage";
 import CreateHomebrewPage from "../pages/CreateHomebrewPage";
 import MyCollectionsPage from "../pages/MyCollectionsPage";
+import MyHomebrewsPage from "../pages/MyHomebrewsPage";
 import ProfilePage from "../pages/ProfilePage";
 import TavernaPage from "../pages/TavernaPage";
 import LeaderboardPage from "../pages/LeaderboardPage";
@@ -25,118 +37,279 @@ import VenuesPage from "../pages/VenuesPage";
 import VenueDetailPage from "../pages/VenueDetailPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
 import NotificationsPage from "../pages/NotificationsPage";
-import BlogPage from "../pages/blog/BlogPage";
-import BlogDetailPage from "../pages/blog/BlogDetailPage";
-import CreateBlogPage from "../pages/blog/CreateBlogPage";
-import MyBlogsPage from "../pages/blog/MyBlogsPage";
-import AboutPage from "../pages/AboutPage";
-import ContactPage from "../pages/ContactPage";
-import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
-import TermsOfServicePage from "../pages/TermsOfServicePage";
 
 const PageContent = () => {
   return (
     <Routes>
+      {/* ========================================
+          PUBLIC ROUTES - Herkes Erişebilir
+      ======================================== */}
+      
       {/* Ana Sayfa */}
       <Route path="/" element={<HomePage />} />
 
-      {/* Blog - YENİ ✨ */}
-      <Route path="/blog" element={<BlogPage />} />
-      <Route path="/blog/:slug" element={<BlogDetailPage />} />
-      <Route path="/blog/yaz" element={<CreateBlogPage />} />
-      <Route path="/blog/duzenle/:id" element={<CreateBlogPage />} />
-      <Route path="/blog/bloglarim" element={<MyBlogsPage />} />
-
-      {/* Wiki & Homebrew */}
+      {/* Wiki - Public okuma, protected yazma */}
       <Route path="/wiki" element={<WikiPage />} />
       <Route path="/wiki/:slug" element={<WikiDetailPage type="official" />} />
-      <Route
-        path="/homebrew/:slug"
-        element={<WikiDetailPage type="homebrew" />}
-      />
-      <Route path="/create-homebrew" element={<CreateHomebrewPage />} />
-      <Route path="/collections/me" element={<MyCollectionsPage />} />
-      <Route path="/homebrews/me" element={<MyHomebrewsPage />} />
+      
+      {/* Homebrew Detail - Public okuma */}
+      <Route path="/homebrew/:slug" element={<WikiDetailPage type="homebrew" />} />
 
-      {/* Dost Mekanlar */}
-      <Route path="/mekanlar" element={<VenuesPage />} />
-      <Route path="/mekanlar/:id" element={<VenueDetailPage />} />
-      <Route path="/mekanlar/ekle" element={<CreateVenuePage />} />
-      <Route path="/venues" element={<Navigate to="/mekanlar" replace />} />
-      <Route
-        path="/venues/:id"
-        element={<Navigate to="/mekanlar/:id" replace />}
-      />
-      <Route
-        path="/venues/new"
-        element={<Navigate to="/mekanlar/ekle" replace />}
-      />
+      {/* Blog - Public okuma */}
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<BlogDetailPage />} />
 
-      {/* Taverna */}
-      <Route path="/taverna" element={<TavernaPage />} />
-      <Route path="/taverna/siralama" element={<LeaderboardPage />} />
-      <Route path="/taverna/loncalar" element={<GuildsPage />} />
-      <Route path="/taverna/loncalar/:id" element={<GuildDetailPage />} />
-      <Route path="/taverna/lonca-olustur" element={<CreateGuildPage />} />
-      <Route path="/taverna/lonca-duzenle/:id" element={<CreateGuildPage />} />
-      <Route path="/taverna/rozetler" element={<BadgesPage />} />
-      <Route
-        path="/guilds"
-        element={<Navigate to="/taverna/loncalar" replace />}
-      />
-      <Route
-        path="/guilds/:id"
-        element={<Navigate to="/taverna/loncalar/:id" replace />}
-      />
-
-      {/* Bit Pazarı */}
-      <Route path="/pazar" element={<MarketplacePage />} />
-      <Route path="/pazar/:id" element={<ListingDetailPage />} />
-      <Route path="/pazar/ilan-olustur" element={<CreateListingPage />} />
-      <Route path="/pazar/duzenle/:id" element={<CreateListingPage />} />
-      <Route path="/marketplace" element={<Navigate to="/pazar" replace />} />
-
-      {/* Profil & Ayarlar */}
-      <Route path="/profil/:username" element={<ProfilePage />} />
-      <Route
-        path="/profile/:username"
-        element={<Navigate to="/profil/:username" replace />}
-      />
-      <Route path="/ayarlar" element={<SettingsPage />} />
-
-      {/* Campaign / Parti Bul */}
-      <Route path="/parti-bul" element={<PartyFinderPage />} />
-      <Route
-        path="/party-finder"
-        element={<Navigate to="/parti-bul" replace />}
-      />
-      <Route path="/kampanya-olustur" element={<CreateCampaignPage />} />
-      <Route path="/kampanya-duzenle/:id" element={<CreateCampaignPage />} />
-      <Route
-        path="/create-campaign"
-        element={<Navigate to="/kampanya-olustur" replace />}
-      />
-
-      {/* Notifications */}
-      <Route path="/bildirimler" element={<NotificationsPage />} />
-      <Route
-        path="/notifications"
-        element={<Navigate to="/bildirimler" replace />}
-      />
-
-      {/* Auth */}
-      <Route path="/giris" element={<LoginPage />} />
-      <Route path="/login" element={<Navigate to="/giris" replace />} />
-      <Route path="/kayit" element={<RegisterPage />} />
-      <Route path="/register" element={<Navigate to="/kayit" replace />} />
-
-      {/* Footer */}
+      {/* Footer Pages */}
       <Route path="/hakkimizda" element={<AboutPage />} />
       <Route path="/iletisim" element={<ContactPage />} />
       <Route path="/gizlilik" element={<PrivacyPolicyPage />} />
       <Route path="/kullanim-sartlari" element={<TermsOfServicePage />} />
 
-      {/* 404 */}
+      {/* Auth Pages */}
+      <Route path="/giris" element={<LoginPage />} />
+      <Route path="/login" element={<Navigate to="/giris" replace />} />
+      <Route path="/kayit" element={<RegisterPage />} />
+      <Route path="/register" element={<Navigate to="/kayit" replace />} />
+
+      {/* ========================================
+          PROTECTED ROUTES - Sadece Üyeler
+      ======================================== */}
+
+      {/* Blog Yazma ve Yönetimi - Protected */}
+      <Route
+        path="/blog/yaz"
+        element={
+          <ProtectedRoute>
+            <CreateBlogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/blog/duzenle/:id"
+        element={
+          <ProtectedRoute>
+            <CreateBlogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/blog/bloglarim"
+        element={
+          <ProtectedRoute>
+            <MyBlogsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Homebrew Oluşturma - Protected */}
+      <Route
+        path="/create-homebrew"
+        element={
+          <ProtectedRoute>
+            <CreateHomebrewPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collections/me"
+        element={
+          <ProtectedRoute>
+            <MyCollectionsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/homebrews/me"
+        element={
+          <ProtectedRoute>
+            <MyHomebrewsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Dost Mekanlar - Protected */}
+      <Route
+        path="/mekanlar"
+        element={
+          <ProtectedRoute>
+            <VenuesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mekanlar/:id"
+        element={
+          <ProtectedRoute>
+            <VenueDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mekanlar/ekle"
+        element={
+          <ProtectedRoute>
+            <CreateVenuePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/venues" element={<Navigate to="/mekanlar" replace />} />
+      <Route path="/venues/:id" element={<Navigate to="/mekanlar/:id" replace />} />
+      <Route path="/venues/new" element={<Navigate to="/mekanlar/ekle" replace />} />
+
+      {/* Taverna - Protected */}
+      <Route
+        path="/taverna"
+        element={
+          <ProtectedRoute>
+            <TavernaPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/taverna/siralama"
+        element={
+          <ProtectedRoute>
+            <LeaderboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/taverna/loncalar"
+        element={
+          <ProtectedRoute>
+            <GuildsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/taverna/loncalar/:id"
+        element={
+          <ProtectedRoute>
+            <GuildDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/taverna/lonca-olustur"
+        element={
+          <ProtectedRoute>
+            <CreateGuildPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/taverna/lonca-duzenle/:id"
+        element={
+          <ProtectedRoute>
+            <CreateGuildPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/taverna/rozetler"
+        element={
+          <ProtectedRoute>
+            <BadgesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/guilds" element={<Navigate to="/taverna/loncalar" replace />} />
+      <Route path="/guilds/:id" element={<Navigate to="/taverna/loncalar/:id" replace />} />
+
+      {/* Bit Pazarı - Protected */}
+      <Route
+        path="/pazar"
+        element={
+          <ProtectedRoute>
+            <MarketplacePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pazar/:id"
+        element={
+          <ProtectedRoute>
+            <ListingDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pazar/ilan-olustur"
+        element={
+          <ProtectedRoute>
+            <CreateListingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pazar/duzenle/:id"
+        element={
+          <ProtectedRoute>
+            <CreateListingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/marketplace" element={<Navigate to="/pazar" replace />} />
+
+      {/* Campaign / Parti Bul - Protected */}
+      <Route
+        path="/parti-bul"
+        element={
+          <ProtectedRoute>
+            <PartyFinderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/party-finder" element={<Navigate to="/parti-bul" replace />} />
+      <Route
+        path="/kampanya-olustur"
+        element={
+          <ProtectedRoute>
+            <CreateCampaignPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/kampanya-duzenle/:id"
+        element={
+          <ProtectedRoute>
+            <CreateCampaignPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/create-campaign" element={<Navigate to="/kampanya-olustur" replace />} />
+
+      {/* Profil & Ayarlar - Protected */}
+      <Route
+        path="/profil/:username"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/profile/:username" element={<Navigate to="/profil/:username" replace />} />
+      <Route
+        path="/ayarlar"
+        element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Bildirimler - Protected */}
+      <Route
+        path="/bildirimler"
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/notifications" element={<Navigate to="/bildirimler" replace />} />
+
+      {/* 404 - Ana sayfaya yönlendir */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
