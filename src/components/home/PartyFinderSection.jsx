@@ -71,8 +71,8 @@ const PartyFinderSection = () => {
             </h2>
 
             <p className="text-lg text-sti leading-relaxed">
-              Zar & Kule'nin gelişmiş <strong>Party Finder</strong> sistemi ile kendine uygun oyun grubunu bulmak artık çok kolay. 
-              İster deneyimli bir Dungeon Master arıyor ol, ister ilk kez zar atacak bir oyuncu; masada senin için her zaman bir yer var.
+              Zar & Kule'nin gelişmiş <strong>Parti Bul</strong> sistemi ile kendine uygun oyun grubunu bulmak artık çok kolay. 
+              İster deneyimli bir Zindan Ustası(DM) arıyor ol, ister ilk kez zar atacak bir oyuncu; masada senin için her zaman bir yer var.
             </p>
 
             <ul className="space-y-4 mt-2">

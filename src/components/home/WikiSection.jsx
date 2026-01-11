@@ -109,7 +109,7 @@ const WikiSection = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
           <WikiStatCard
             icon={<Sparkles size={28} />}
-            count={stats.SPELLS > 0 ? `${stats.SPELLS}+` : '---'}
+            count={stats.SPELLS > 0 ? `${stats.SPELLS}` : '---'}
             label="Büyü & Cantrip"
             subtext="5e & Pathfinder"
             delay="0"
@@ -117,7 +117,7 @@ const WikiSection = () => {
 
           <WikiStatCard
             icon={<Skull size={28} />}
-            count={stats.MONSTERS > 0 ? `${stats.MONSTERS}+` : '---'}
+            count={stats.MONSTERS > 0 ? `${stats.MONSTERS}` : '---'}
             label="Canavar"
             subtext="Bestiary"
             delay="100"
@@ -125,7 +125,7 @@ const WikiSection = () => {
 
           <WikiStatCard
             icon={<Scroll size={28} />}
-            count={stats.MAGIC_ITEM > 0 ? `${stats.MAGIC_ITEM}+` : '---'}
+            count={stats.MAGIC_ITEM > 0 ? `${stats.MAGIC_ITEM}` : '---'}
             label="Büyülü Eşya"
             subtext="Loot Tables"
             delay="200"
@@ -133,7 +133,7 @@ const WikiSection = () => {
 
           <WikiStatCard
             icon={<Feather size={28} />}
-            count={stats.HOMEBREW > 0 ? `${stats.HOMEBREW}+` : '---'}
+            count={stats.HOMEBREW > 0 ? `${stats.HOMEBREW}` : '---'}
             label="Topluluk Girdisi"
             subtext="Homebrew İçerik"
             delay="300"

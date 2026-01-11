@@ -37,6 +37,9 @@ import VenuesPage from "../pages/VenuesPage";
 import VenueDetailPage from "../pages/VenueDetailPage";
 import CreateVenuePage from "../pages/CreateVenuePage";
 import NotificationsPage from "../pages/NotificationsPage";
+import WikiCollectionDetailPage from "../pages/WikiCollectionDetailPage";
+import BlogCollectionDetailPage from "../pages/BlogCollectionDetailPage";
+import ModerationDashboardPage from "../pages/ModerationDashboardPage";
 
 const PageContent = () => {
   return (
@@ -44,16 +47,19 @@ const PageContent = () => {
       {/* ========================================
           PUBLIC ROUTES - Herkes Erişebilir
       ======================================== */}
-      
+
       {/* Ana Sayfa */}
       <Route path="/" element={<HomePage />} />
 
       {/* Wiki - Public okuma, protected yazma */}
       <Route path="/wiki" element={<WikiPage />} />
       <Route path="/wiki/:slug" element={<WikiDetailPage type="official" />} />
-      
+
       {/* Homebrew Detail - Public okuma */}
-      <Route path="/homebrew/:slug" element={<WikiDetailPage type="homebrew" />} />
+      <Route
+        path="/homebrew/:slug"
+        element={<WikiDetailPage type="homebrew" />}
+      />
 
       {/* Blog - Public okuma */}
       <Route path="/blog" element={<BlogPage />} />
@@ -127,6 +133,26 @@ const PageContent = () => {
         }
       />
 
+      {/* Wiki Koleksiyon Detay - Protected */}
+      <Route
+        path="/wiki-collections/:id"
+        element={
+          <ProtectedRoute>
+            <WikiCollectionDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Blog Koleksiyon Detay - Protected */}
+      <Route
+        path="/blog-collections/:id"
+        element={
+          <ProtectedRoute>
+            <BlogCollectionDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Dost Mekanlar - Protected */}
       <Route
         path="/mekanlar"
@@ -153,8 +179,14 @@ const PageContent = () => {
         }
       />
       <Route path="/venues" element={<Navigate to="/mekanlar" replace />} />
-      <Route path="/venues/:id" element={<Navigate to="/mekanlar/:id" replace />} />
-      <Route path="/venues/new" element={<Navigate to="/mekanlar/ekle" replace />} />
+      <Route
+        path="/venues/:id"
+        element={<Navigate to="/mekanlar/:id" replace />}
+      />
+      <Route
+        path="/venues/new"
+        element={<Navigate to="/mekanlar/ekle" replace />}
+      />
 
       {/* Taverna - Protected */}
       <Route
@@ -213,8 +245,14 @@ const PageContent = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/guilds" element={<Navigate to="/taverna/loncalar" replace />} />
-      <Route path="/guilds/:id" element={<Navigate to="/taverna/loncalar/:id" replace />} />
+      <Route
+        path="/guilds"
+        element={<Navigate to="/taverna/loncalar" replace />}
+      />
+      <Route
+        path="/guilds/:id"
+        element={<Navigate to="/taverna/loncalar/:id" replace />}
+      />
 
       {/* Bit Pazarı - Protected */}
       <Route
@@ -260,7 +298,10 @@ const PageContent = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/party-finder" element={<Navigate to="/parti-bul" replace />} />
+      <Route
+        path="/party-finder"
+        element={<Navigate to="/parti-bul" replace />}
+      />
       <Route
         path="/kampanya-olustur"
         element={
@@ -277,7 +318,10 @@ const PageContent = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/create-campaign" element={<Navigate to="/kampanya-olustur" replace />} />
+      <Route
+        path="/create-campaign"
+        element={<Navigate to="/kampanya-olustur" replace />}
+      />
 
       {/* Profil & Ayarlar - Protected */}
       <Route
@@ -288,7 +332,10 @@ const PageContent = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/profile/:username" element={<Navigate to="/profil/:username" replace />} />
+      <Route
+        path="/profile/:username"
+        element={<Navigate to="/profil/:username" replace />}
+      />
       <Route
         path="/ayarlar"
         element={
@@ -307,7 +354,20 @@ const PageContent = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/notifications" element={<Navigate to="/bildirimler" replace />} />
+      <Route
+        path="/notifications"
+        element={<Navigate to="/bildirimler" replace />}
+      />
+
+            {/* Taverna - Protected */}
+      <Route
+        path="/mod"
+        element={
+          <ProtectedRoute>
+            <ModerationDashboardPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* 404 - Ana sayfaya yönlendir */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,4 +1,4 @@
-// src/pages/WikiDetailPage.jsx - GitHub UI + YORUM SİSTEMİ ✨
+// src/pages/WikiDetailPage.jsx - GitHub UI + YORUM + KOLEKSİYON SİSTEMİ ✨
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -16,6 +16,15 @@ import { fetchWikiDetail, clearDetail } from '../redux/actions/wikiActions';
 // Components
 import { CategoryDetail } from '../components/wiki/categories';
 import WikiCommentSection from '../components/wiki/comments/WikiCommentSection';
+import CollectionModal from '../components/common/CollectionModal';
+
+// Collection Hooks
+import {
+  useWikiCollections,
+  useAddWikiToCollection,
+  useRemoveWikiFromCollection,
+  useCreateWikiCollection,
+} from '../hooks/useWikiCollections';
 
 // Utils & Constants
 import { 
@@ -34,7 +43,7 @@ const WikiDetailPage = ({ type = 'official' }) => {
   const navigate = useNavigate();
   const isHomebrew = type === 'homebrew';
 
-  // Redux state - DOĞRU STATE İSİMLERİ
+  // Redux state
   const { currentEntry, detailLoading, detailError } = useSelector((state) => state.wiki);
   const { isAuthenticated } = useSelector((state) => state.auth);
 
@@ -42,6 +51,13 @@ const WikiDetailPage = ({ type = 'official' }) => {
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+
+  // Collection hooks
+  const { data: collections = [], isLoading: isLoadingCollections } = useWikiCollections();
+  const addToCollectionMutation = useAddWikiToCollection();
+  const removeFromCollectionMutation = useRemoveWikiFromCollection();
+  const createCollectionMutation = useCreateWikiCollection();
 
   // Load wiki data
   useEffect(() => {
@@ -99,7 +115,12 @@ const WikiDetailPage = ({ type = 'official' }) => {
   };
 
   const handleBookmark = () => {
-    toast.info('Koleksiyon sistemi yakında!');
+    if (!isAuthenticated) {
+      toast.info('Koleksiyona eklemek için giriş yapmalısınız');
+      return;
+    }
+    
+    setIsCollectionModalOpen(true);
   };
 
   const handleShare = () => {
@@ -241,7 +262,7 @@ const WikiDetailPage = ({ type = 'official' }) => {
                 />
               </div>
 
-              {/* YORUM SİSTEMİ - YENİ ✨ */}
+              {/* YORUM SİSTEMİ */}
               <WikiCommentSection 
                 wikiId={currentEntry.id} 
                 isHomebrew={isHomebrew}
@@ -286,7 +307,7 @@ const WikiDetailPage = ({ type = 'official' }) => {
                     {isLiked ? 'Beğenildi' : 'Beğen'}
                   </button>
 
-                  {/* Koleksiyona Ekle */}
+                  {/* Koleksiyona Ekle - NOW ACTIVE */}
                   <button
                     onClick={handleBookmark}
                     className="w-full flex items-center justify-center gap-2 py-3 bg-mbg border border-cbg text-mtf rounded-xl font-bold text-sm hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-all"
@@ -337,6 +358,19 @@ const WikiDetailPage = ({ type = 'official' }) => {
           </div>
         </div>
       </div>
+
+      {/* Collection Modal */}
+      <CollectionModal
+        isOpen={isCollectionModalOpen}
+        onClose={() => setIsCollectionModalOpen(false)}
+        itemId={currentEntry?.id}
+        collections={collections}
+        isLoadingCollections={isLoadingCollections}
+        onAddToCollection={addToCollectionMutation.mutateAsync}
+        onRemoveFromCollection={removeFromCollectionMutation.mutateAsync}
+        onCreateCollection={createCollectionMutation.mutateAsync}
+        type="wiki"
+      />
     </>
   );
 };
