@@ -8,19 +8,16 @@ const PartyFinderSection = () => {
   const [campaignCount, setCampaignCount] = useState(0);
   const { sendRequest } = useAxios();
 
-  useEffect(() => {
-    // Kampanya sayısını al
-    sendRequest({
-      url: '/campaigns/public',
-      method: METHODS.GET,
-      params: { page: 0, size: 1 }, // Sadece sayı için
-      callbackSuccess: (res) => {
-        const totalCount = res.data.totalElements || res.data.length || 0;
-        setCampaignCount(totalCount);
-      },
-      showErrorToast: false,
-    });
-  }, []);
+useEffect(() => {
+  sendRequest({
+    url: '/campaigns/count/open',  // Backend'de zaten var
+    method: METHODS.GET,
+    callbackSuccess: (res) => {
+      setCampaignCount(res.data); // Direkt sayı döndürür
+    },
+    showErrorToast: false,
+  });
+}, []);
 
   return (
     <section className="py-20 md:py-32 bg-mbg overflow-hidden">

@@ -40,6 +40,7 @@ import NotificationsPage from "../pages/NotificationsPage";
 import WikiCollectionDetailPage from "../pages/WikiCollectionDetailPage";
 import BlogCollectionDetailPage from "../pages/BlogCollectionDetailPage";
 import ModerationDashboardPage from "../pages/ModerationDashboardPage";
+import HomebrewModeratorPreviewPage from "../pages/HomebrewModeratorPreviewPage";
 
 const PageContent = () => {
   return (
@@ -359,16 +360,25 @@ const PageContent = () => {
         element={<Navigate to="/bildirimler" replace />}
       />
 
-            {/* Taverna - Protected */}
+      {/* Moderasyon Dashboard */}
       <Route
-        path="/mod"
+        path="/mod/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="MODERATOR">
             <ModerationDashboardPage />
           </ProtectedRoute>
         }
       />
 
+      {/* Homebrew Moderator Preview - Draft/Pending görüntüleme */}
+      <Route
+        path="/mod/homebrew/preview/:id"
+        element={
+          <ProtectedRoute requiredRole="MODERATOR">
+            <HomebrewModeratorPreviewPage />
+          </ProtectedRoute>
+        }
+      />
       {/* 404 - Ana sayfaya yönlendir */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

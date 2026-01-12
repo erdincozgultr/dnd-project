@@ -80,15 +80,9 @@ const WikiCard = ({ item, isHomebrew = false }) => {
     }
   };
 
-   console.log('WikiCard item:', item);
-  console.log('Category:', item.category);
-  console.log('Level:', item.level);
-  console.log('Type:', item.type);
-  console.log('Challenge Rating:', item.challenge_rating);
-
   // Kategoriye göre detay bilgileri
   const renderCategoryDetails = () => {
-    const data = item.categoryData;
+    const data =  item.content || item.categoryData;
 
     switch (item.category) {
       case "SPELL":
