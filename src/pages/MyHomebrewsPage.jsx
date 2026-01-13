@@ -1,9 +1,9 @@
-// src/pages/MyHomebrewsPage.jsx
+// src/pages/MyHomebrewsPage.jsx - MINIMAL CHANGES, WikiCard KORUNDU
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Sparkles, Plus, Edit3, Trash2, Eye, Heart, ChevronLeft, Loader2, Filter } from 'lucide-react';
+import { Sparkles, Plus, Edit3, Trash2, ChevronLeft, Loader2, Filter } from 'lucide-react';
 import { toast } from 'react-toastify';
 import WikiCard from '../components/wiki/list/WikiCard';
 import useAxios, { METHODS } from '../hooks/useAxios';
@@ -16,6 +16,7 @@ const MyHomebrewsPage = () => {
 
   const [homebrews, setHomebrews] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('ALL'); // ✅ EKLE
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -56,12 +57,19 @@ const MyHomebrewsPage = () => {
     }))
   ];
 
-  const filteredHomebrews = selectedCategory === 'ALL'
-    ? homebrews
-    : homebrews.filter(h => h.category === selectedCategory);
+  // ✅ GÜNCELLE: İki filter birden
+  const filteredHomebrews = homebrews.filter(h => {
+    const categoryMatch = selectedCategory === 'ALL' || h.category === selectedCategory;
+    const statusMatch = statusFilter === 'ALL' || h.status === statusFilter;
+    return categoryMatch && statusMatch;
+  });
 
+  // ✅ GÜNCELLE: Status sayıları ekle
   const stats = {
     total: homebrews.length,
+    published: homebrews.filter(h => h.status === 'PUBLISHED').length,
+    draft: homebrews.filter(h => h.status === 'DRAFT').length,
+    pending: homebrews.filter(h => h.status === 'PENDING_APPROVAL').length,
     totalLikes: homebrews.reduce((acc, h) => acc + (h.likeCount || 0), 0),
     totalViews: homebrews.reduce((acc, h) => acc + (h.viewCount || 0), 0),
   };
@@ -128,6 +136,31 @@ const MyHomebrewsPage = () => {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-12">
+        {/* ✅ YENİ: Status Filter */}
+        <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
+          <span className="text-sm font-bold text-sti flex-shrink-0">Durum:</span>
+          {[
+            { id: 'ALL', label: 'Tümü', count: stats.total },
+            { id: 'PUBLISHED', label: '✅ Yayında', count: stats.published },
+            { id: 'DRAFT', label: '📦 Taslak', count: stats.draft },
+            { id: 'PENDING_APPROVAL', label: '⏳ Bekliyor', count: stats.pending },
+          ].map(status => (
+            <button
+              key={status.id}
+              onClick={() => setStatusFilter(status.id)}
+              className={`
+                px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all
+                ${statusFilter === status.id
+                  ? 'bg-cta text-white shadow-lg'
+                  : 'bg-white border border-cbg text-sti hover:border-cta/50'
+                }
+              `}
+            >
+              {status.label} ({status.count})
+            </button>
+          ))}
+        </div>
+
         {/* Category Filter */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
           <Filter size={18} className="text-sti flex-shrink-0" />
@@ -163,9 +196,9 @@ const MyHomebrewsPage = () => {
           <div className="text-center py-20 bg-white border border-cbg rounded-2xl">
             <Sparkles size={64} className="mx-auto text-cbg mb-4" />
             <h3 className="text-xl font-black text-mtf mb-2">
-              {selectedCategory === 'ALL' 
+              {homebrews.length === 0 
                 ? 'Henüz homebrew oluşturmadın'
-                : 'Bu kategoride homebrew yok'
+                : 'Bu filtreye uygun içerik bulunamadı'
               }
             </h3>
             <p className="text-sti mb-6">İlk homebrew'unu oluşturarak başla!</p>
@@ -179,20 +212,53 @@ const MyHomebrewsPage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredHomebrews.map(homebrew => (
-              <div key={homebrew.id} className="relative">
+              <div 
+                key={homebrew.id} 
+                className="relative"
+                onClick={() => {
+                  // ✅ Draft/Pending ise edit, Published ise detay
+                  if (homebrew.status === 'PUBLISHED') {
+                    navigate(`/homebrew/${homebrew.slug}`);
+                  } else {
+                    navigate(`/homebrews/edit/${homebrew.id}`, { state: { homebrew } });
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                {/* Status Badge */}
+                <div className="absolute top-2 left-2 z-10">
+                  <span className={`
+                    px-3 py-1 rounded-lg font-bold text-xs shadow-md
+                    ${homebrew.status === 'PUBLISHED' ? 'bg-green-500 text-white' :
+                      homebrew.status === 'DRAFT' ? 'bg-gray-500 text-white' :
+                      'bg-amber-500 text-white'}
+                  `}>
+                    {homebrew.status === 'PUBLISHED' && '✅ Yayında'}
+                    {homebrew.status === 'DRAFT' && '📦 Taslak'}
+                    {homebrew.status === 'PENDING_APPROVAL' && '⏳ Bekliyor'}
+                  </span>
+                </div>
+
+                {/* WikiCard - DEĞİŞMEDİ */}
                 <WikiCard item={homebrew} isHomebrew={true} />
                 
                 {/* Action Buttons */}
                 <div className="absolute top-2 right-2 flex gap-2 z-10">
-                  <Link
-                    to={`/create-homebrew?edit=${homebrew.id}`}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/homebrews/edit/${homebrew.id}`, { state: { homebrew } });
+                    }}
                     className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg"
                     title="Düzenle"
                   >
                     <Edit3 size={14} />
-                  </Link>
+                  </button>
                   <button
-                    onClick={() => handleDelete(homebrew.id, homebrew.name)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(homebrew.id, homebrew.name);
+                    }}
                     className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-lg"
                     title="Sil"
                   >

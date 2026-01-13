@@ -134,6 +134,15 @@ const PageContent = () => {
         }
       />
 
+      <Route
+        path="/homebrews/edit/:id"
+        element={
+          <ProtectedRoute>
+            <CreateHomebrewPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Wiki Koleksiyon Detay - Protected */}
       <Route
         path="/wiki-collections/:id"

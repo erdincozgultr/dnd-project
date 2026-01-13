@@ -1,6 +1,6 @@
-// src/pages/blog/BlogDetailPage.jsx
+// src/pages/blog/BlogDetailPage.jsx - FIXED AVATAR FLICKER
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
@@ -16,6 +16,7 @@ import { getCategoryConfig } from '../../constants/blogConstants';
 const BlogDetailPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const [avatarError, setAvatarError] = useState(false); // ✅ YENİ
   
   // TanStack Query - Blog detay (10 dk cache)
   const { data: blog, isLoading, error } = useBlogDetail(slug);
@@ -24,6 +25,11 @@ const BlogDetailPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Reset avatar error when blog changes
+  useEffect(() => {
+    setAvatarError(false);
+  }, [blog?.id]);
 
   // Loading state
   if (isLoading) {
@@ -175,14 +181,22 @@ const BlogDetailPage = () => {
             {/* Author Card */}
             {blog.author && (
               <div className="flex items-center gap-4 bg-mbg rounded-xl p-4 mb-8">
-                <img
-                  src={blog.author.avatarUrl || '/default-avatar.png'}
-                  alt={blog.author.displayName || blog.author.username}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
-                  onError={(e) => {
-                    e.target.src = '/default-avatar.png';
-                  }}
-                />
+                {/* ✅ FIXED: Avatar with proper state management */}
+                <div className="flex-shrink-0 w-16 h-16 relative">
+                  {blog.author.avatarUrl && !avatarError ? (
+                    <img
+                      src={blog.author.avatarUrl}
+                      alt={blog.author.displayName || blog.author.username}
+                      className="w-full h-full rounded-full object-cover border-2 border-white shadow-md"
+                      onError={() => setAvatarError(true)}
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold border-2 border-white shadow-md text-xl">
+                      {(blog.author.displayName || blog.author.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                
                 <div>
                   <p className="text-sm text-sti font-medium">Yazar</p>
                   <p className="text-lg font-bold text-mtf">

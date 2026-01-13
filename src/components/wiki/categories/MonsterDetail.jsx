@@ -227,12 +227,13 @@ const MonsterDetail = ({ data }) => {
       {renderAbilityBlock(data.legendary_actions, 'Efsanevi Eylemler', Star, 'legendary', 'amber')}
 
       {/* Açıklama */}
-      {data.desc && (
-        <div className="bg-white border border-cbg rounded-xl p-4">
-          <p className="text-sm text-sti leading-relaxed">
-             <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.desc}</ReactMarkdown></p>
-        </div>
-      )}
+{data.desc && (
+  <div className="bg-white border border-cbg rounded-xl p-4">
+    <div className="text-sm text-sti leading-relaxed prose prose-sm max-w-none">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.desc}</ReactMarkdown>
+    </div>
+  </div>
+)}
     </div>
   );
 };

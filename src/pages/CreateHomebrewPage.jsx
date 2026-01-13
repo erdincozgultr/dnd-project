@@ -1,11 +1,11 @@
-// src/pages/CreateHomebrewPage.jsx
+// src/pages/CreateHomebrewPage.jsx - FIXED EDIT MODE
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
-
+import { useParams, useLocation } from "react-router-dom";
 import CategorySelector from "../components/homebrew/create/CategorySelector";
 import HomebrewDisclaimer from "../components/homebrew/create/HomebrewDisclaimer";
 import MarkdownEditor from "../components/homebrew/create/MarkdownEditor";
@@ -29,6 +29,11 @@ import { getTemplate } from "../utils/homebrewTemplates";
 const CreateHomebrewPage = () => {
   const navigate = useNavigate();
   const { sendRequest, loading } = useAxios();
+  const { id } = useParams();
+  const location = useLocation();
+  
+  const isEditMode = !!id;
+  const homebrewFromState = location.state?.homebrew;
 
   const [category, setCategory] = useState("");
   const [name, setName] = useState("");
@@ -37,98 +42,126 @@ const CreateHomebrewPage = () => {
   const [tags, setTags] = useState("");
   const [content, setContent] = useState({});
   const [rulesAccepted, setRulesAccepted] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(!isEditMode);
+
+  // ✅ FIX: Edit mode - state'den data yükle
+  useEffect(() => {
+    if (isEditMode && homebrewFromState) {
+      setName(homebrewFromState.name || "");
+      setDescription(homebrewFromState.description || "");
+      setCategory(homebrewFromState.category || "");
+      setImageUrl(homebrewFromState.imageUrl || "");
+      setTags(homebrewFromState.tags?.join(", ") || "");
+      setContent(homebrewFromState.content || {});
+      setRulesAccepted(true); // Edit modda kurallar zaten kabul edilmiş
+      setIsDataLoaded(true);
+    } else if (isEditMode && !homebrewFromState) {
+      // State'de data yoksa API'den çek
+      sendRequest({
+        url: `/homebrews/my-homebrews`,
+        method: METHODS.GET,
+        callbackSuccess: (res) => {
+          const homebrew = res.data.find(h => h.id === parseInt(id));
+          if (homebrew) {
+            setName(homebrew.name || "");
+            setDescription(homebrew.description || "");
+            setCategory(homebrew.category || "");
+            setImageUrl(homebrew.imageUrl || "");
+            setTags(homebrew.tags?.join(", ") || "");
+            setContent(homebrew.content || {});
+            setRulesAccepted(true);
+            setIsDataLoaded(true);
+          } else {
+            toast.error("Homebrew bulunamadı");
+            navigate("/homebrews/me");
+          }
+        },
+        callbackError: () => {
+          toast.error("Veri yüklenemedi");
+          navigate("/homebrews/me");
+        }
+      });
+    }
+  }, [isEditMode, id, homebrewFromState]);
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
-    setContent(getTemplate(newCategory));
+    if (!isEditMode || !content || Object.keys(content).length === 0) {
+      setContent(getTemplate(newCategory));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!rulesAccepted) {
+    if (!rulesAccepted && !isEditMode) {
       toast.error("Lütfen kuralları okuyup kabul edin");
       return;
     }
-
-    const tagsArray = tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
 
     const payload = {
       name,
       description,
       category,
       content,
-      tags: tagsArray,
+      tags: tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
       imageUrl: imageUrl || null,
     };
 
     sendRequest({
-      url: "/homebrews",
-      method: METHODS.POST,
+      url: isEditMode ? `/homebrews/${id}` : "/homebrews",
+      method: isEditMode ? METHODS.PUT : METHODS.POST,
       data: payload,
-      callbackSuccess: (response) => {
+      callbackSuccess: () => {
         toast.success(
-          "Homebrew içeriğiniz oluşturuldu! Moderatör onayı bekleniyor...",
-          {
-            autoClose: 5000,
-          }
+          isEditMode ? "✅ Güncellendi!" : "🎉 Homebrew oluşturuldu! Moderatör onayı bekliyor..."
         );
-        // Formu sıfırla
-        setCategory("");
-        setName("");
-        setDescription("");
-        setImageUrl("");
-        setTags("");
-        setContent({});
-        setRulesAccepted(false);
-        // Kullanıcı profiline yönlendir
-        setTimeout(() => {
-          navigate("/profil");
-        }, 2000);
+        navigate("/homebrews/me");
       },
     });
   };
+
   const renderCategoryForm = () => {
     if (!category) return null;
 
     switch (category) {
-      case "SPELLS": // ✅ SPELL → SPELLS
+      case "SPELLS":
         return <SpellForm formData={content} onChange={setContent} />;
 
-      case "MONSTERS": // ✅ MONSTER → MONSTERS
+      case "MONSTERS":
         return <MonsterForm formData={content} onChange={setContent} />;
 
-      case "RACES": // ✅ RACE → RACES
+      case "RACES":
         return <RaceForm formData={content} onChange={setContent} />;
 
-      case "CLASSES": // ✅ CLASS → CLASSES
+      case "CLASSES":
         return <ClassForm formData={content} onChange={setContent} />;
 
-      case "BACKGROUND": // ✅ Aynı
-        return <BackgroundDetail formData={content} onChange={setContent} />;
+      case "BACKGROUND":
+        return <BackgroundForm formData={content} onChange={setContent} />;
 
-      case "FEATS": // ✅ FEAT → FEATS
+      case "FEATS":
         return <FeatForm formData={content} onChange={setContent} />;
 
-      case "MAGIC_ITEM": // ✅ Aynı
+      case "MAGIC_ITEM":
         return <MagicItemForm formData={content} onChange={setContent} />;
 
-      case "WEAPON": // ✅ Aynı
+      case "WEAPON":
         return <WeaponForm formData={content} onChange={setContent} />;
 
-      case "ARMOR": // ✅ Aynı
+      case "ARMOR":
         return <ArmorForm formData={content} onChange={setContent} />;
 
-      case "CONDITIONS": // ✅ CONDITION → CONDITIONS
+      case "CONDITIONS":
         return <ConditionForm formData={content} onChange={setContent} />;
 
-      case "PLANES": // ✅ PLANE → PLANES
+      case "PLANES":
         return <PlaneForm formData={content} onChange={setContent} />;
 
-      case "CUSTOM": // ✅ Aynı
+      case "CUSTOM":
         return (
           <div className="space-y-4">
             <MarkdownEditor
@@ -151,10 +184,21 @@ const CreateHomebrewPage = () => {
     }
   };
 
+  // ✅ Loading state for edit mode
+  if (isEditMode && !isDataLoaded) {
+    return (
+      <div className="min-h-screen bg-mbg flex items-center justify-center">
+        <Loader2 size={48} className="animate-spin text-cta" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-mbg font-display pb-20">
       <Helmet>
-        <title>Yeni Homebrew Oluştur | Zar & Kule</title>
+        <title>
+          {isEditMode ? "Homebrew Düzenle" : "Yeni Homebrew Oluştur"} | Zar & Kule
+        </title>
       </Helmet>
 
       {/* Hero Header */}
@@ -169,7 +213,7 @@ const CreateHomebrewPage = () => {
 
         <div className="container mx-auto px-4 relative z-10">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/homebrews/me")}
             className="flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft size={18} />
@@ -182,10 +226,15 @@ const CreateHomebrewPage = () => {
             </div>
             <div>
               <h1 className="text-3xl md:text-4xl font-black text-white">
-                Yeni Homebrew <span className="text-purple-300">Oluştur</span>
+                {isEditMode ? "Homebrew " : "Yeni Homebrew "}
+                <span className="text-purple-300">
+                  {isEditMode ? "Düzenle" : "Oluştur"}
+                </span>
               </h1>
               <p className="text-white/70 mt-1">
-                Kendi D&D içeriğini oluştur ve topluluğa katkıda bulun
+                {isEditMode
+                  ? "Homebrew içeriğini güncelle"
+                  : "Kendi D&D içeriğini oluştur ve topluluğa katkıda bulun"}
               </p>
             </div>
           </div>
@@ -196,11 +245,13 @@ const CreateHomebrewPage = () => {
       <div className="container mx-auto px-4 -mt-8">
         <div className="max-w-4xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Disclaimer */}
-            <HomebrewDisclaimer
-              onAccept={setRulesAccepted}
-              accepted={rulesAccepted}
-            />
+            {/* Disclaimer - Sadece yeni oluşturmada göster */}
+            {!isEditMode && (
+              <HomebrewDisclaimer
+                onAccept={setRulesAccepted}
+                accepted={rulesAccepted}
+              />
+            )}
 
             {/* Basic Info Card */}
             <div className="bg-white rounded-2xl border-2 border-cbg p-6 space-y-6">
@@ -248,6 +299,7 @@ const CreateHomebrewPage = () => {
               <CategorySelector
                 value={category}
                 onChange={handleCategoryChange}
+                disabled={isEditMode} // ✅ Edit modda kategori değiştirilemez
               />
 
               {/* Image URL */}
@@ -311,7 +363,7 @@ const CreateHomebrewPage = () => {
             <div className="flex items-center justify-between gap-4 bg-white rounded-2xl border-2 border-cbg p-6">
               <button
                 type="button"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/homebrews/me")}
                 className="px-6 py-3 rounded-xl font-bold text-sti hover:text-mtf 
                            border-2 border-cbg hover:border-mtf transition-colors"
               >
@@ -320,7 +372,7 @@ const CreateHomebrewPage = () => {
 
               <button
                 type="submit"
-                disabled={loading || !category || !rulesAccepted}
+                disabled={loading || !category || (!isEditMode && !rulesAccepted)}
                 className="px-8 py-3 rounded-xl font-bold bg-cta text-white 
                            hover:bg-cta/90 transition-colors flex items-center gap-2
                            disabled:opacity-50 disabled:cursor-not-allowed"
@@ -328,12 +380,12 @@ const CreateHomebrewPage = () => {
                 {loading ? (
                   <>
                     <Loader2 size={20} className="animate-spin" />
-                    Oluşturuluyor...
+                    {isEditMode ? "Güncelleniyor..." : "Oluşturuluyor..."}
                   </>
                 ) : (
                   <>
                     <Sparkles size={20} />
-                    Homebrew Oluştur
+                    {isEditMode ? "Güncelle" : "Homebrew Oluştur"}
                   </>
                 )}
               </button>
@@ -342,10 +394,20 @@ const CreateHomebrewPage = () => {
             {/* Info Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm text-blue-700">
-                ℹ️ Oluşturduğunuz homebrew içerik{" "}
-                <strong>PENDING_APPROVAL</strong> statüsünde kaydedilecek ve
-                moderatör onayından sonra yayınlanacaktır. Durum değişiklikleri
-                hakkında bildirim alacaksınız.
+                {isEditMode ? (
+                  <>
+                    ℹ️ Değişiklikler kaydedildiğinde içeriğin durumu{" "}
+                    <strong>PENDING_APPROVAL</strong> olarak değişecek ve tekrar
+                    moderatör onayından geçecektir.
+                  </>
+                ) : (
+                  <>
+                    ℹ️ Oluşturduğunuz homebrew içerik{" "}
+                    <strong>PENDING_APPROVAL</strong> statüsünde kaydedilecek ve
+                    moderatör onayından sonra yayınlanacaktır. Durum değişiklikleri
+                    hakkında bildirim alacaksınız.
+                  </>
+                )}
               </p>
             </div>
           </form>
