@@ -1,36 +1,39 @@
-// src/components/blog/list/BlogCard.jsx
+// src/components/blog/list/BlogCard.jsx - FIXED AVATAR FLICKER
 
-import React from "react";
-import { Link } from "react-router-dom";
-import { Heart, Eye, Clock, Calendar } from "lucide-react";
-import { getCategoryConfig } from "../../../constants/blogConstants";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Heart, Eye, Clock, Calendar } from 'lucide-react';
+import { getCategoryConfig } from '../../../constants/blogConstants';
 
 /**
  * Blog Kartı Component
  * Medium-like tasarım - minimalist, okuma odaklı
  */
 const BlogCard = ({ blog, onMouseEnter }) => {
+  const [imageError, setImageError] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+  
   // Kategori bilgisi
   const categoryConfig = getCategoryConfig(blog.category);
   const CategoryIcon = categoryConfig.icon;
 
   // Tarih formatla (örn: "5 gün önce")
   const formatDate = (dateString) => {
-    if (!dateString) return "";
-
+    if (!dateString) return '';
+    
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now - date;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return "Bugün";
-    if (diffDays === 1) return "Dün";
+    if (diffDays === 0) return 'Bugün';
+    if (diffDays === 1) return 'Dün';
     if (diffDays < 7) return `${diffDays} gün önce`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} hafta önce`;
-
-    return date.toLocaleDateString("tr-TR", {
-      day: "numeric",
-      month: "long",
+    
+    return date.toLocaleDateString('tr-TR', { 
+      day: 'numeric', 
+      month: 'long' 
     });
   };
 
@@ -42,28 +45,25 @@ const BlogCard = ({ blog, onMouseEnter }) => {
     >
       {/* Thumbnail Image */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-        {blog.thumbnailUrl ? (
+        {blog.thumbnailUrl && !imageError ? (
           <img
             src={blog.thumbnailUrl}
             alt={blog.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              // Resim yüklenemezse placeholder göster
-              e.target.style.display = "none";
-            }}
+            onError={() => setImageError(true)}
           />
         ) : (
-          // Resim yoksa icon göster
+          // Resim yoksa veya yüklenemezse icon göster
           <div className="w-full h-full flex items-center justify-center">
-            <CategoryIcon
-              size={64}
-              className={`text-${categoryConfig.color}-300 opacity-50`}
+            <CategoryIcon 
+              size={64} 
+              className={`text-${categoryConfig.color}-300 opacity-50`} 
             />
           </div>
         )}
 
         {/* Category Badge - Sol üst köşe */}
-        <div
+        <div 
           className={`absolute top-3 left-3 px-3 py-1.5 bg-gradient-to-r ${categoryConfig.bgGradient} text-white rounded-lg shadow-lg`}
         >
           <div className="flex items-center gap-1.5">
@@ -85,31 +85,23 @@ const BlogCard = ({ blog, onMouseEnter }) => {
         {/* Author & Date */}
         {blog.author && (
           <div className="flex items-center gap-3 mb-4 pb-4 border-b border-cbg">
-            {/* Author Avatar */}
-            {blog.author.avatarUrl ? (
-              <img
-                src={blog.author.avatarUrl}
-                alt={blog.author.displayName || blog.author.username}
-                className="w-10 h-10 rounded-full object-cover border-2 border-cbg"
-                onError={(e) => {
-                  // Yüklenemezse fallback avatar göster
-                  e.target.style.display = "none";
-                  e.target.nextElementSibling?.classList.remove("hidden");
-                }}
-              />
-            ) : null}
-
-            {/* Fallback Avatar (her zaman render et ama gizle) */}
-            <div
-              className={`w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold border-2 border-cbg ${
-                blog.author.avatarUrl ? "hidden" : ""
-              }`}
-            >
-              {(blog.author.displayName || blog.author.username || "U")
-                .charAt(0)
-                .toUpperCase()}
+            {/* ✅ FIXED: Avatar with proper fallback */}
+            <div className="flex-shrink-0 w-10 h-10 relative">
+              {blog.author.avatarUrl && !avatarError ? (
+                <img
+                  src={blog.author.avatarUrl}
+                  alt={blog.author.displayName || blog.author.username}
+                  className="w-full h-full rounded-full object-cover border-2 border-cbg"
+                  onError={() => setAvatarError(true)}
+                />
+              ) : (
+                // Fallback avatar - gradient + initial
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold border-2 border-cbg">
+                  {(blog.author.displayName || blog.author.username || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
-
+            
             {/* Author Info */}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-mtf truncate">

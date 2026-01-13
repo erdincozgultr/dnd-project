@@ -248,7 +248,7 @@ const GuildCard = ({ guild, onAction }) => {
             )}
 
             <a
-              href={`/guilds/${guild.id}`}
+              href={`/taverna/loncalar/${guild.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-colors"
